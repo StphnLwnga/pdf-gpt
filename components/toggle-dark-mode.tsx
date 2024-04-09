@@ -23,7 +23,7 @@ export function ToggleDarkMode(): JSX.Element {
   }, [theme]);
 
   return (
-    <div>
+    <div className="fixed ml-[95vw] mt-[1vw]">
       <Button
         variant="ghost"
         size="icon"
@@ -33,14 +33,14 @@ export function ToggleDarkMode(): JSX.Element {
         {!isDarkTheme ? (
           <TooltipComponent
             tooltipTrigger={
-              <FcNoIdea className="h-[1.2rem] w-[1.2rem] transition-all z-55" />
+              <FcNoIdea className="h-[1.25rem] w-[1.25rem] transition-all z-55" />
             }
             tooltipContent="Dark Mode"
           />
         ) : (
           <TooltipComponent
             tooltipTrigger={
-              <FcIdea className="h-[1.2rem] w-[1.2rem] transition-all z-55" />
+              <FcIdea className="h-[1.25rem] w-[1.25rem] transition-all z-55" />
             }
             tooltipContent="Light Mode"
           />
