@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/theme-provider";
 import { ToggleDarkMode } from "@/components/toggle-dark-mode";
 import { Toaster } from "@/components/toaster";
+import PDFSidebar from "./_components/pdf-sidebar/PDFSidebar";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +33,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ToggleDarkMode />
-          {children}
+          <ResizablePanelGroup direction="horizontal" className="border">
+            <ResizablePanel defaultSize={20}>
+              <PDFSidebar />
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
+          </ResizablePanelGroup>
           <Toaster />
         </ThemeProvider>
       </body>
