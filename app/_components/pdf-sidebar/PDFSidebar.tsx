@@ -5,6 +5,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { PDFSidebarListItem } from "./PDFSidebarListItem";
+import { LoadingSidebar } from "./Loading";
 
 const PDFSidebar = () => {
   const { resolvedTheme } = useTheme();
@@ -29,19 +30,26 @@ const PDFSidebar = () => {
           className="border-x-0 border-t-0 border-b-2 shadow-none rounded-none focus-visible:ring-0"
         />
       </div>
-      <div className="flex pt-[1vh] pb-[2vh] max-h-[88vh] overflow-y-scroll overflow-x-hidden">
-        {pdfFilesList ? (
-          <ul
-            role="list"
-            className={cn(
-              "divide-y divide-gray-100 w-full mr-0",
-              resolvedTheme === "dark" && "divide-gray-650",
-            )}
-          >
-            {pdfFilesList}
-          </ul>
-        ) : (
-          "Loading...."
+      <div
+        className={cn(
+          "flex pt-[1vh] pb-[2vh] max-h-[88vh] overflow-y-scroll overflow-x-hidden",
+          pdfFilesList.length === 0 && "overflow-y-hidden",
+        )}
+      >
+        <ul
+          role="list"
+          className={cn(
+            "divide-y divide-gray-100 w-full mr-0",
+            resolvedTheme === "dark" && "divide-gray-650",
+          )}
+        >
+          {pdfFilesList}
+        </ul>
+        {/* {<LoadingSidebar />} */}
+        {pdfFilesList.length === 0 && (
+          <span className="text-xs italic">
+            Your files will be appear here...
+          </span>
         )}
       </div>
     </div>

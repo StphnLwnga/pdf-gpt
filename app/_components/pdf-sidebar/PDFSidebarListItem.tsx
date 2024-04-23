@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { MouseEventHandler } from "react";
+import Link from "next/link";
 import { FcDocument } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,25 +22,30 @@ export const PDFSidebarListItem = ({
       variant="ghost"
       className="w-full flex items-center justify-start rounded-none pr-2 h-14 pl-0"
     >
-      <div className="max-w-10">
-        <FcDocument className="mr-2 h-8 w-8 my-2" />
-      </div>
-      <div
-        className={cn(
-          "truncate flex flex-col ",
-          !isDarkTheme && "text-slate-500",
-        )}
+      <Link
+        href={`/doc/${pdfTitle.toLowerCase().replace(/ /g, "-")}`}
+        className="w-full flex items-center"
       >
-        <span className="text-start truncate">{pdfTitle}</span>
-        <span
+        <div className="max-w-10">
+          <FcDocument className="mr-2 h-8 w-8 my-2" />
+        </div>
+        <div
           className={cn(
-            "text-start truncate text-xs italic text-slate-400",
-            !isDarkTheme && "text-slate-400",
+            "truncate flex flex-col ",
+            !isDarkTheme && "text-slate-500",
           )}
         >
-          {pdfUrl}
-        </span>
-      </div>
+          <span className="text-start truncate">{pdfTitle}</span>
+          <span
+            className={cn(
+              "text-start truncate text-xs italic text-slate-400",
+              !isDarkTheme && "text-slate-400",
+            )}
+          >
+            {pdfUrl}
+          </span>
+        </div>
+      </Link>
     </Button>
   );
 };
