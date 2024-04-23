@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 
 const PDFSidebar = () => {
   const { resolvedTheme } = useTheme();
@@ -20,52 +19,52 @@ const PDFSidebar = () => {
       <Button
         key={i}
         variant="ghost"
-        className="w-full flex items-center justify-start"
+        className="w-full flex items-center justify-start rounded-none pr-2 h-14"
       >
-        <FcDocument className="mr-2 h-4 w-4" />
-        <span className={cn(resolvedTheme !== "dark" && "text-black")}>
-          PDF Document {i}
-        </span>
+        <div className="basis-1/5 lg-basis-1/8">
+          <FcDocument className="mr-2 h-8 w-8 my-2" />
+        </div>
+        <div
+          className={cn(
+            "truncate flex flex-col basis-4/5 lg-basis-7/8",
+            resolvedTheme !== "dark" && "text-slate-500",
+          )}
+        >
+          <span className="text-start truncate">PDF Document {i}</span>
+          <span
+            className={cn(
+              "text-start truncate text-xs",
+              resolvedTheme !== "dark" && "text-slate-400",
+            )}
+          >
+            https://www.media.wmg-is.com/media/portal/media/cms/docs/201202/curreny-quote-sheet_1330379143004.pdf
+          </span>
+        </div>
       </Button>
     ));
 
   return (
-    <div className="flex h-full">
-      <div className="h-full min-w-[20vw] flex flex-col pl-4">
-        <div className="h-[8vh] max-h-[8vh] mt-[2vh] w-full pr-4 flex items-end justify-center  ">
-          <Input
-            placeholder="🔎 Search files..."
-            className="border-x-0 border-t-0 border-b-2 shadow-none rounded-none focus-visible:ring-0"
-          />
-        </div>
-        <div className="flex pt-[1vh] pb-[2vh] max-h-[88vh] overflow-y-scroll overflow-x-hidden">
-          <ul role="list" className="divide-y divide-gray-100">
-            {[...people, ...people, ...people].map((person) => (
-              <li
-                key={person.email}
-                className="flex justify-between gap-x-4 py-5 pr-2"
-              >
-                <div className="flex min-w-0 gap-x-4">
-                  <FcDocument className="h-7 w-7 flex-none" />
-                  <div className="min-w-0 flex-auto">
-                    <p className="text-sm font-semibold leading-6">
-                      {person.name}
-                    </p>
-                    <p className="mt-1 truncate text-xs leading-5">
-                      {person.email}
-                    </p>
-                  </div>
-                </div>
-                <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                  <p className="text-sm leading-6">{person.role}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+    // <div className="flex h-full">
+    <div className="h-full min-w-[20vw] flex flex-col pl-4">
+      <div className="h-[8vh] mt-[2vh] w-full pr-4 flex items-end justify-center  ">
+        <Input
+          placeholder="🔎 Search files..."
+          className="border-x-0 border-t-0 border-b-2 shadow-none rounded-none focus-visible:ring-0"
+        />
       </div>
-      {/* <Separator orientation="vertical" /> */}
+      <div className="flex pt-[1vh] pb-[2vh] max-h-[88vh] overflow-y-scroll overflow-x-hidden">
+        <ul
+          role="list"
+          className={cn(
+            "divide-y divide-gray-100 w-full mr-0",
+            resolvedTheme === "dark" && "divide-gray-650",
+          )}
+        >
+          {pdfFilesList}
+        </ul>
+      </div>
     </div>
+    // </div>
   );
 };
 
