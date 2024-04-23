@@ -32,7 +32,7 @@ import {
 
 const PDFInput = () => {
   return (
-    <div className="width-[80vw] ml-[20vw] pt-[5vw] pr-4 h-[90vh] flex justify-center">
+    <div className="width-[80vw] pt-[5vw] pr-4 h-[90vh] flex justify-center">
       <div className="grid w-full max-w-sm justify-center align-middle">
         <Tabs defaultValue="pasteLink" className="w-[40vw]">
           <TabsList className="grid w-full grid-cols-2">
