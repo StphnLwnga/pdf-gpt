@@ -10,6 +10,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import SettingsIcons from "./_components/settings-icons/SettingsIcons";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,7 +39,10 @@ export default function RootLayout({
               <PDFSidebar />
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
+            <ResizablePanel defaultSize={80}>
+              <SettingsIcons />
+              {children}
+            </ResizablePanel>
           </ResizablePanelGroup>
           <Toaster />
         </ThemeProvider>
