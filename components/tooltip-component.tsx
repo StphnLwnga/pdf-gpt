@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -15,28 +15,33 @@ interface TooltipComponentProps {
 }
 
 /**
-* Renders a tooltip component.
-*
-* @param {TooltipComponentProps} tooltipTrigger - The element that triggers the tooltip.
-* @param {TooltipComponentProps} tooltipContent - The content to be displayed in the tooltip.
-* @return {JSX.Element} The rendered tooltip component.
-*/
-const TooltipComponent = ({ tooltipTrigger, tooltipContent }: TooltipComponentProps): JSX.Element => {
+ * Renders a tooltip component.
+ *
+ * @param {TooltipComponentProps} tooltipTrigger - The element that triggers the tooltip.
+ * @param {TooltipComponentProps} tooltipContent - The content to be displayed in the tooltip.
+ * @return {JSX.Element} The rendered tooltip component.
+ */
+const TooltipComponent = ({
+  tooltipTrigger,
+  tooltipContent,
+}: TooltipComponentProps): JSX.Element => {
   const { resolvedTheme } = useTheme();
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>{tooltipTrigger}</TooltipTrigger>
-        <TooltipContent className={cn(
-          "bg-sky-300/30 text-sky-700 text-sm z-5000",
-          resolvedTheme === 'dark' && "bg-sky-300/30 text-slate-200"
-        )}>
+        <TooltipContent
+          className={cn(
+            "bg-neutral-300/30 text-neutral-500 text-sm z-5000",
+            resolvedTheme === "dark" && "bg-neutral-300/30 text-slate-200",
+          )}
+        >
           {tooltipContent}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
-}
+};
 
 export default TooltipComponent;
