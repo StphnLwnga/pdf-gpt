@@ -5,8 +5,9 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { PDFSidebarListItem } from "./PDFSidebarListItem";
-import { LoadingSidebar } from "./Loading";
+import { PDFSidebarListItem } from "./pdf-sidebar-list-item";
+import { LoadingSidebar } from "./loading";
+import SettingsIcons from "@/components/settings-icons";
 
 const PDFSidebar = () => {
   const router = useRouter();
@@ -39,7 +40,7 @@ const PDFSidebar = () => {
 
   return (
     <div className="h-full min-w-[20vw] flex flex-col pl-4">
-      <div className="h-[8vh] mt-[2vh] w-full pr-4 flex items-end justify-center  ">
+      <div className="min-h-[8vh] mt-[2vh] w-full pr-4 flex items-end justify-center  ">
         <Input
           placeholder="🔎 Search files..."
           className="border-x-0 border-t-0 border-b-2 shadow-none rounded-none focus-visible:ring-0"
@@ -54,7 +55,7 @@ const PDFSidebar = () => {
         <ul
           role="list"
           className={cn(
-            "divide-y divide-gray-100 w-full mr-0",
+            "divide-y divide-gray-100 w-full mr-0 pr-2",
             resolvedTheme === "dark" && "divide-gray-650",
           )}
         >

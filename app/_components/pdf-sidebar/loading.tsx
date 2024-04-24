@@ -24,7 +24,7 @@ export const LoadingSidebar = () => {
     <ul
       role="list"
       className={cn(
-        "divide-y divide-gray-100 w-full mr-0",
+        "divide-y divide-gray-100 w-full mr-0 pr-2",
         resolvedTheme === "dark" && "divide-gray-650",
       )}
     >
