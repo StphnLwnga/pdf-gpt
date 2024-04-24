@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
+import { debounce } from "lodash";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { PDFSidebarListItem } from "./pdf-sidebar-list-item";
@@ -13,6 +14,8 @@ const PDFSidebar = () => {
   const router = useRouter();
 
   const { resolvedTheme } = useTheme();
+
+  const inputElement = useRef<null | HTMLInputElement>(null);
 
   const [activeItemId, setActiveItemId] = useState<null | number>();
 
@@ -38,12 +41,21 @@ const PDFSidebar = () => {
       />
     ));
 
+  const handlePdfListSearch = useCallback(
+    debounce((inputVal: string) => {
+      console.log(inputVal);
+    }, 500),
+    [],
+  );
+
   return (
     <div className="h-full min-w-[20vw] flex flex-col pl-4">
       <div className="min-h-[8vh] mt-[2vh] w-full pr-4 flex items-end justify-center  ">
         <Input
           placeholder="🔎 Search files..."
           className="border-x-0 border-t-0 border-b-2 shadow-none rounded-none focus-visible:ring-0"
+          ref={inputElement}
+          onChange={() => handlePdfListSearch(inputElement.current?.value!)}
         />
       </div>
       <div
