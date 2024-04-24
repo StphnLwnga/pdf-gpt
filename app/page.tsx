@@ -1,5 +1,5 @@
 import Image from "next/image";
-import PDFInput from "./_components/pdf-input/PDFInput";
+import PDFInput from "./_components/pdf-input/pdf-input";
 
 export default function Home() {
   return (
