@@ -21,7 +21,6 @@ const PDFSidebar = () => {
   };
 
   useEffect(() => {
-    console.log(window.location);
     if (window.location.pathname === "/") setActiveItemId(null);
   }, [activeItemId]);
 
