@@ -33,6 +33,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "langchain": "^0.1.31",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.365.0",
     "next": "14.1.4",
     "next-themes": "^0.3.0",
@@ -50,6 +51,7 @@
     "zod-to-json-schema": "^3.22.5"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.0",
     "@types/node": "^20",
     "@types/pdf-parse": "^1.1.4",
     "@types/react": "^18",
