@@ -1,6 +1,6 @@
 import { Paper } from "./types";
 
-export const paper: Paper[] = [
+export const papers: Paper[] = [
   {
     id: "3fa85f64-5717-4562-b3fc-2c963f66aafd",
     paper_text:
