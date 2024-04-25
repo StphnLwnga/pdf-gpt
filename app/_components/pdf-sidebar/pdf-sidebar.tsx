@@ -3,12 +3,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { debounce } from "lodash";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { PDFSidebarListItem } from "./pdf-sidebar-list-item";
 import { LoadingSidebar } from "./loading";
-import SettingsIcons from "@/components/settings-icons";
+import { Paper } from "@/lib/types";
 
 const PDFSidebar = () => {
   const router = useRouter();
@@ -17,9 +18,31 @@ const PDFSidebar = () => {
 
   const inputElement = useRef<null | HTMLInputElement>(null);
 
-  const [activeItemId, setActiveItemId] = useState<null | number>();
+  const [activeItemId, setActiveItemId] = useState<null | string>();
+  const [pdfList, setPdfList] = useState<Paper[]>([]);
+  const [filteredPdfList, setFilteredPdfList] = useState<JSX.Element[] | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
-  const handleListItemClick = (pdfTitle: string, pdfId: number) => {
+  useEffect(() => {
+    // Fetch PDF list
+    const fetchPDFList = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(`/api/doc/notes`,);
+        setPdfList(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPDFList();
+
+    setFetchAttempted(true);
+  }, []);
+
+  const handleListItemClick = (pdfTitle: string, pdfId: string) => {
     setActiveItemId(pdfId);
     router.push(`/doc/${pdfTitle.toLowerCase().replace(/ /g, "-")}`);
   };
@@ -28,28 +51,41 @@ const PDFSidebar = () => {
     if (window.location.pathname === "/") setActiveItemId(null);
   }, [activeItemId]);
 
-  const pdfFilesList = Array(30)
-    .fill("_")
-    .map((_, i) => (
-      <PDFSidebarListItem
-        key={i}
-        isActiveItem={i === activeItemId}
-        isDarkTheme={resolvedTheme === "dark"}
-        pdfTitle={`PDF Document ${i}`}
-        pdfUrl={`https://www.media.wmg-is.com/media/portal/media/cms/docs/201202/curreny-quote-sheet_1330379143004.pdf`}
-        onClick={() => handleListItemClick(`PDF Document ${i}`, i)}
-      />
-    ));
+  const pdfFilesList = pdfList.map((paper: Paper, i) => (
+    <PDFSidebarListItem
+      key={paper.id}
+      isActiveItem={paper.id === activeItemId}
+      isDarkTheme={resolvedTheme === "dark"}
+      pdfTitle={paper.paper_title}
+      pdfUrl={paper.paper_url}
+      onClick={() => handleListItemClick(paper.paper_title, paper.id)}
+    />
+  ));
 
   const handlePdfListSearch = useCallback(
     debounce((inputVal: string) => {
-      console.log(inputVal);
+      if (inputVal !== "") {
+        const filteredList = [...pdfList].filter((pdf) => pdf.paper_title.toLowerCase().includes(inputVal.toLowerCase()));
+        const filteredListElems = filteredList.map((paper: Paper, i) => (
+          <PDFSidebarListItem
+            key={paper.id}
+            isActiveItem={paper.id === activeItemId}
+            isDarkTheme={resolvedTheme === "dark"}
+            pdfTitle={paper.paper_title}
+            pdfUrl={paper.paper_url}
+            onClick={() => handleListItemClick(paper.paper_title, paper.id)}
+          />
+        ));
+        setFilteredPdfList(filteredListElems);
+      } else {
+        setFilteredPdfList(null);
+      }
     }, 500),
-    [],
+    [pdfList],
   );
 
   return (
-    <div className="h-full min-w-[20vw] flex flex-col pl-4">
+    <div className="h-[99vh] min-w-[20vw] flex flex-col pl-4">
       <div className="min-h-[8vh] mt-[2vh] w-full pr-4 flex items-end justify-center  ">
         <Input
           placeholder="🔎 Search files..."
@@ -60,21 +96,25 @@ const PDFSidebar = () => {
       </div>
       <div
         className={cn(
-          "flex pt-[1vh] pb-[2vh] max-h-[88vh] overflow-y-scroll overflow-x-hidden",
+          "flex pt-[1vh] pb-[2vh] h-full max-h-[88vh] overflow-y-scroll overflow-x-hidden",
           pdfFilesList.length === 0 && "overflow-y-hidden",
         )}
       >
-        <ul
-          role="list"
-          className={cn(
-            "divide-y divide-gray-100 w-full mr-0 pr-2",
-            resolvedTheme === "dark" && "divide-gray-650",
-          )}
-        >
-          {pdfFilesList}
-        </ul>
-        {/* {<LoadingSidebar />} */}
-        {pdfFilesList.length === 0 && (
+        {fetchAttempted && pdfFilesList.length > 0 && (
+          <ul
+            role="list"
+            className={cn(
+              "divide-y divide-gray-100 w-full mr-0 pr-2 min-h-full",
+              resolvedTheme === "dark" && "divide-gray-650",
+            )}
+          >
+            {filteredPdfList ?? pdfFilesList}
+          </ul>
+        )}
+
+        {loading || (pdfFilesList.length === 0 && !fetchAttempted) && <LoadingSidebar />}
+
+        {fetchAttempted && !loading && pdfFilesList.length === 0 && (
           <span className="text-xs italic">
             Your files will be appear here...
           </span>
