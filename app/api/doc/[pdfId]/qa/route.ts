@@ -28,7 +28,7 @@ export async function POST(req: Request, { params }: { params: { pdfId: string }
 
     return NextResponse.json({ pdfId, data }, { status: 200 });
   } catch (error) {
-    console.log("[COURSES]", error);
+    console.log("[QA_GENERATE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -48,7 +48,7 @@ export async function GET(req: Request, { params }: { params: { pdfId: string } 
 
     return NextResponse.json({ pdfId }, { status: 200 });
   } catch (error) {
-    console.log("[COURSES]", error);
+    console.log("[QA_RETRIEVAL]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
