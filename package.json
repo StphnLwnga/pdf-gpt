@@ -40,6 +40,7 @@
     "openai": "^4.33.0",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "4.1.392",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.2",
@@ -62,6 +63,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
     "postcss": "^8",
+    "raw-loader": "^4.0.2",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }
