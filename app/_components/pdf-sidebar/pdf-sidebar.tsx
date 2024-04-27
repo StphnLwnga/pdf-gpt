@@ -20,13 +20,17 @@ const PDFSidebar = () => {
 
   const [activeItemId, setActiveItemId] = useState<null | string>();
   const [pdfList, setPdfList] = useState<Paper[]>([]);
-  const [filteredPdfList, setFilteredPdfList] = useState<JSX.Element[] | null>(null);
+  const [filteredPdfList, setFilteredPdfList] = useState<JSX.Element[] | null>();
   const [loading, setLoading] = useState<boolean>(false);
   const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
   useEffect(() => {
-    // Fetch PDF list
-    const fetchPDFList = async () => {
+    /**
+     * Fetches the list of PDF documents from the server and updates the state with the fetched data.
+     *
+     * @return {Promise<void>} A promise that resolves when the fetch operation is complete.
+     */
+    const fetchPDFList = async (): Promise<void> => {
       setLoading(true);
       try {
         const { data } = await axios.get(`/api/doc/notes`,);
@@ -42,7 +46,14 @@ const PDFSidebar = () => {
     setFetchAttempted(true);
   }, []);
 
-  const handleListItemClick = (pdfTitle: string, pdfId: string) => {
+  /**
+   * Handles the click event on a PDF sidebar list item.
+   *
+   * @param {string} pdfTitle - The title of the PDF document.
+   * @param {string} pdfId - The ID of the PDF document.
+   * @return {void} This function does not return a value.
+   */
+  const handleListItemClick = (pdfTitle: string, pdfId: string): void => {
     setActiveItemId(pdfId);
     router.push(`/doc/${pdfTitle.toLowerCase().replace(/ /g, "-")}`);
   };
