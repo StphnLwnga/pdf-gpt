@@ -111,7 +111,7 @@ const PDFSidebar = () => {
           pdfFilesList.length === 0 && "overflow-y-hidden",
         )}
       >
-        {fetchAttempted && pdfFilesList.length > 0 && (
+        {!loading && fetchAttempted && pdfFilesList.length > 0 && (
           <ul
             role="list"
             className={cn(
