@@ -4,8 +4,12 @@
 
 // import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-
+import axios from "axios";
+import { PDFDocument } from 'pdf-lib';
+import * as fs from 'fs';
+import path from 'path';
 import { papers } from "@/lib/mock";
+import { loadPdfFromUrl } from "@/lib/helpers";
 
 /**
  * Sends a POST request to the OpenAI API to generate a summary of the PDF 
@@ -22,6 +26,15 @@ export async function POST(req: Request): Promise<NextResponse> {
 		// Extract PDF title, URL & pages to delete from request body
 		const { pdfTitle, pdfUrl, pagesToDelete } = await req.json();
 
+		if (!pdfTitle || !pdfUrl)
+			return new NextResponse("Invalid request, name and URL are required", { status: 400 });
+
+		// TODO: Check if the PDF already exists in the database and handle accordingly
+
+		const pdfAsBuffer = await loadPdfFromUrl({ url: pdfUrl });
+
+		const returnEncodedUri = encodeURI(pdfTitle.trim().toLowerCase().replace(/ /g, "-"));
+
 		/**
 		 * Extract the title from the request's body.
 		 * Generate the summary using the OpenAI API.
@@ -29,9 +42,10 @@ export async function POST(req: Request): Promise<NextResponse> {
 		 * Return the PDF with the title and summary.
 		*/
 
-		const data = { pdfTitle, pdfUrl, pagesToDelete };
+		// const data = { pdfTitle, pdfUrl, pagesToDelete };
 
-		return NextResponse.json({ data }, { status: 200 });
+		return NextResponse.json({ pdfAsBuffer, pdfBytes: pdfAsBuffer.byteLength, pdfId: returnEncodedUri }, { status: 200 });
+		// return NextResponse.next();
 	} catch (error) {
 		console.log("[NOTES_GENERATE]", error);
 		return new NextResponse("Internal Error", { status: 500 });
