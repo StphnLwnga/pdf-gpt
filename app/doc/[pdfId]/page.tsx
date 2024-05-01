@@ -42,12 +42,12 @@ export default async function DocPage({ params }: { params: { pdfId: string };  
         <ResizableHandle />
         <ResizablePanel defaultSize={55}>
           <ResizablePanelGroup direction="vertical">
-            <ResizablePanel defaultSize={25}>
+            <ResizablePanel defaultSize={35}>
               <PDFNotes />
               <span className="text-2xl italic">{pdfId}</span>
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel defaultSize={75}>
+            <ResizablePanel defaultSize={65}>
               <PDFChat />
             </ResizablePanel>
           </ResizablePanelGroup>
