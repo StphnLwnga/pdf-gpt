@@ -1,20 +1,15 @@
 "use client"
 
-import React, { useEffect } from 'react'
-import axios from 'axios';
-import { useSearchParams } from 'next/navigation';
+import React from 'react'
 import { useTheme } from 'next-themes';
 import { SpecialZoomLevel, Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
-import { usePdfStore } from '@/lib/store';
-import { cn } from '@/lib/utils';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import LoadingPDFViewer from './loading';
 import ErrorLoadingPDF from './error'
 
-import { loadPdfFromUrl } from '@/lib/helpers';
 
 const PDFViewer = ({ pdfDoc }: { pdfDoc: string }) => {
   const { resolvedTheme } = useTheme();
@@ -34,7 +29,6 @@ const PDFViewer = ({ pdfDoc }: { pdfDoc: string }) => {
               borderRadius: '5px',
             }}
           >
-            {/* {pdfDoc ?  */}
             <Viewer
               fileUrl={ `data:application/pdf;base64,${pdfDoc}` }
               enableSmoothScroll
@@ -43,8 +37,6 @@ const PDFViewer = ({ pdfDoc }: { pdfDoc: string }) => {
               plugins={[defaultLayoutPluginInstance]}
               renderError={(error) => <ErrorLoadingPDF error={error} resolvedTheme={resolvedTheme} />}
             />
-            {/* : <LoadingPDFViewer resolvedTheme={resolvedTheme} /> */}
-            {/* } */}
           </div>
         </Worker>
       </React.Suspense>
