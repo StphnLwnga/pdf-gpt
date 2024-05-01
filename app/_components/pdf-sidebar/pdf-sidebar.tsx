@@ -2,27 +2,33 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import axios from "axios";
 import { debounce } from "lodash";
+import { Paper } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { usePdfStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
 import { PDFSidebarListItem } from "./pdf-sidebar-list-item";
 import { LoadingSidebar } from "./loading";
-import { Paper } from "@/lib/types";
 
 const PDFSidebar = () => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const { resolvedTheme } = useTheme();
 
+  const { activePdfId, pdfDocsArray, loadingDoc, setActivePdfId, setPdfDocsArray, setLoadingDoc } = usePdfStore();
+
   const inputElement = useRef<null | HTMLInputElement>(null);
 
-  const [activeItemId, setActiveItemId] = useState<null | string>();
-  const [pdfList, setPdfList] = useState<Paper[]>([]);
   const [filteredPdfList, setFilteredPdfList] = useState<JSX.Element[] | null>();
   const [loading, setLoading] = useState<boolean>(false);
   const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (pathname === "/") setActivePdfId(null);
+  }, [pathname]);
 
   useEffect(() => {
     /**
@@ -30,18 +36,18 @@ const PDFSidebar = () => {
      *
      * @return {Promise<void>} A promise that resolves when the fetch operation is complete.
      */
-    const fetchPDFList = async (): Promise<void> => {
+    (async (): Promise<void> => {
       setLoading(true);
       try {
-        const {data} = await axios.get(`/api/doc/notes`,);
-        setPdfList(data);
+        const { data } = await axios.get(`/api/doc/notes`,);
+        // setPdfList(data);
+        setPdfDocsArray(data as Paper[]);
       } catch (error) {
         console.log(error);
       } finally {
         setLoading(false);
       }
-    };
-    fetchPDFList();
+    })();
 
     setFetchAttempted(true);
   }, []);
@@ -54,18 +60,15 @@ const PDFSidebar = () => {
    * @return {void} This function does not return a value.
    */
   const handleListItemClick = (pdfTitle: string, pdfId: string): void => {
-    setActiveItemId(pdfId);
+    setActivePdfId(pdfId);
+
     router.push(`/doc/${pdfId}`);
   };
 
-  useEffect(() => {
-    if (window.location.pathname === "/") setActiveItemId(null);
-  }, [activeItemId]);
-
-  const pdfFilesList = pdfList.map((paper: Paper, i) => (
+  const pdfFilesList = pdfDocsArray.map((paper: Paper, i) => (
     <PDFSidebarListItem
       key={paper.id}
-      isActiveItem={paper.id === activeItemId}
+      isActiveItem={paper.id === activePdfId}
       isDarkTheme={resolvedTheme === "dark"}
       pdfTitle={paper.paper_title}
       pdfUrl={paper.paper_url}
@@ -76,11 +79,11 @@ const PDFSidebar = () => {
   const handlePdfListSearch = useCallback(
     debounce((inputVal: string) => {
       if (inputVal !== "") {
-        const filteredList = [...pdfList].filter((pdf) => pdf.paper_title.toLowerCase().includes(inputVal.toLowerCase()));
+        const filteredList = [...pdfDocsArray].filter((pdf) => pdf.paper_title.toLowerCase().includes(inputVal.toLowerCase()));
         const filteredListElems = filteredList.map((paper: Paper, i) => (
           <PDFSidebarListItem
             key={paper.id}
-            isActiveItem={paper.id === activeItemId}
+            isActiveItem={paper.id === activePdfId}
             isDarkTheme={resolvedTheme === "dark"}
             pdfTitle={paper.paper_title}
             pdfUrl={paper.paper_url}
@@ -92,14 +95,14 @@ const PDFSidebar = () => {
         setFilteredPdfList(null);
       }
     }, 500),
-    [pdfList],
+    [pdfDocsArray],
   );
 
   return (
     <div className="h-[99vh] min-w-[20vw] flex flex-col pl-4">
       <div className="min-h-[8vh] mt-[2vh] w-full pr-4 flex items-end justify-center  ">
         <Input
-          placeholder="🔎 Search files..."
+          placeholder="  🔎  Search files..."
           className="border-x-0 border-t-0 border-b-2 shadow-none rounded-none focus-visible:ring-0"
           ref={inputElement}
           onChange={() => handlePdfListSearch(inputElement.current?.value!)}

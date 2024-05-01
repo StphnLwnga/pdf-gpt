@@ -1,26 +1,33 @@
 import { create } from 'zustand'
 import { Paper, Note } from './types'
 
+
 type State = {
 	activePdfId: string | null,
-	pdfBuffersArray: Paper[],
+	pdfDocsArray: Paper[],
+	loadingDoc: boolean,
 }
 
 type Action = {
 	setActivePdfId: (pdfId: string | null) => void,
-	setPdfBuffersArray: (paper: Paper) => void,
+	setPdfDocsArray: (pdfDocs: Paper[]) => void,
+	updatePdfDocsArray: (pdfDoc: Paper) => void,
+	setLoadingDoc: (loadingDoc: boolean) => void,
 }
 
 export const usePdfStore = create<State & Action>((set) => ({
 	activePdfId: null,
-	pdfBuffersArray: [],
+	pdfDocsArray: [],
+	loadingDoc: false,
 	setActivePdfId: (pdfId: string | null) => set((state: State) => ({ activePdfId: pdfId, })),
-	setPdfBuffersArray: (paper: Paper) => {
+	setPdfDocsArray: (pdfDocs: Paper[]) => set((state: State) => ({ pdfDocsArray: pdfDocs, })),
+	updatePdfDocsArray: (pdfDoc: Paper) => {
 		set((state: State) => ({
-			pdfBuffersArray: [
-				...state.pdfBuffersArray,
-				paper,
+			pdfDocsArray: [
+				...state.pdfDocsArray,
+				pdfDoc,
 			],
 		}))
 	},
+	setLoadingDoc: (loadingDoc) => set((state: State) => ({ loadingDoc, })),
 }));
