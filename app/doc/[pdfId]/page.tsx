@@ -1,21 +1,27 @@
 import React from "react";
-import {
-  PDFChat,
-  PDFNotes,
-  PDFViewer,
-} from "./_components";
+import { redirect, useSearchParams } from 'next/navigation'
+import * as fs from "fs";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import * as fs from "fs";
-import { redirect } from "next/navigation";
 import { Paper } from "@/lib/types";
 import { loadPdfFromUrl } from "@/lib/helpers";
+import PageLoadBackdrop from "@/components/page-load-backdrop";
+import {
+  PDFChat,
+  PDFNotes,
+  PDFViewer,
+} from "./_components";
 
-export default async function DocPage({ params }: { params: { pdfId: string };  }) {
+
+export default async function DocPage({ params, searchParams }: { params: { pdfId: string }; searchParams: { [key: string]: string | string[] | undefined } }) {
   const { pdfId } = params;
+  
+  const { continueBackdrop } = searchParams.continueBackdrop === 'false' ? { continueBackdrop: false } : { continueBackdrop: undefined };
+
+  console.log({continueBackdrop})
 
   /**
    * TODO: Read document data directly from database and storage 
@@ -32,6 +38,7 @@ export default async function DocPage({ params }: { params: { pdfId: string };  
 
   return (
     <div className="h-full w-full">
+      <PageLoadBackdrop pageLoad={continueBackdrop} />
       <ResizablePanelGroup
         direction="horizontal"
         className="w-full h-full"

@@ -1,14 +1,16 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useTheme } from 'next-themes';
 import { SpecialZoomLevel, Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+import { usePdfStore } from '@/lib/store';
 import LoadingPDFViewer from './loading';
 import ErrorLoadingPDF from './error'
+import PageLoadBackdrop from '@/components/page-load-backdrop';
 
 
 const PDFViewer = ({ pdfDoc }: { pdfDoc: string }) => {
@@ -30,7 +32,7 @@ const PDFViewer = ({ pdfDoc }: { pdfDoc: string }) => {
             }}
           >
             <Viewer
-              fileUrl={ `data:application/pdf;base64,${pdfDoc}` }
+              fileUrl={`data:application/pdf;base64,${pdfDoc}`}
               enableSmoothScroll
               defaultScale={SpecialZoomLevel.PageFit}
               theme={resolvedTheme === 'dark' ? 'dark' : 'light'}

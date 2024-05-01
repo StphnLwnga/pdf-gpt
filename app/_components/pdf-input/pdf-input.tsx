@@ -13,6 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import PageLoadBackdrop from "@/components/page-load-backdrop";
 
 
 /**
@@ -22,18 +23,14 @@ import {
 const PDFInput = () => {
   const router = useRouter();
 
-  // const { setCurrentPdfData, removeCurrentPdfData } = usePdfStore();
-
-  // useEffect(() => {
-  //   removeCurrentPdfData();
-  // }, []);
+  const { loadingDoc, setLoadingDoc } = usePdfStore();
 
   const [isOpen, setIsOpen] = React.useState(false)
   const [pastedLink, setPastedLink] = React.useState('');
-  const [pdfTitle, setPdfTitle] = React.useState('');
   const [pagesToDelete, setPagesToDelete] = React.useState('');
 
   const handleLinkSubmit = async () => {
+    setLoadingDoc(true);
     try {
       console.log('Attempting to get PDF link');
       const response = await axios.post(`/api/doc/notes`, {
@@ -41,13 +38,11 @@ const PDFInput = () => {
         pdfTitle: `Testing PDF title`,
       });
       const { data } = response;
-      console.log(data);
       // setCurrentPdfData(data);
-      return router.push(`/doc/${data?.pdfId}`);
+      return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
     } catch (error) {
       console.log(error);
     }
-
   }
 
   useEffect(() => {
@@ -56,7 +51,9 @@ const PDFInput = () => {
 
 
   return (
-    <div className="width-[80vw] pt-[10%] pr-4 h-[90vh] flex items-start justify-center">
+    <div className="h-full w-full">
+      <PageLoadBackdrop pageLoad={loadingDoc} />
+      <div className="width-[80vw] pt-[10%] pr-4 h-[90vh] flex items-start justify-center">
       <div className="grid w-full max-w-sm items-center justify-center align-middle">
         <Tabs defaultValue="pasteLink" className="w-[40vw]">
           <TabsList className="grid w-full grid-cols-2">
@@ -71,6 +68,9 @@ const PDFInput = () => {
                   className="w-[40vw]"
                   type={tab === 'pasteLink' ? "text" : "file"}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPastedLink(e.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    e.key === 'Enter' && !!pastedLink && handleLinkSubmit();
+                  }}
                 />
                 <Button
                   type="submit"
@@ -114,6 +114,8 @@ const PDFInput = () => {
         </Tabs>
       </div>
     </div>
+    </div>
+    
   );
 };
 
