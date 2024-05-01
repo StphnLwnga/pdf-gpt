@@ -100,3 +100,11 @@ body {
     background: #555;
   }
 }
+
+.navbar {
+  background-color: transparent;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 49;
+  border-bottom-right-radius: 10px;
+}

@@ -8,14 +8,14 @@ import { ToggleDarkMode } from "@/components/toggle-dark-mode";
 
 const SettingsIcons = () => {
   return (
-    <div className="flex fixed pt-2 pl-2 flex-row-reverse z-10">
-      <Button asChild className="rounded-full px-2" variant="ghost">
+    <div className="flex fixed pt-1 flex-row-reverse navbar">
+      <Button asChild className="rounded-full p0 w-[2.2rem]" variant="ghost">
         <Link href="/" className="text-sm p-0">
           <TooltipComponent tooltipTrigger="🏠️" tooltipContent="Home" />
           <span className="sr-only">Go to home page</span>
         </Link>
       </Button>
-      <Button className="text-sm rounded-full px-2" variant="ghost">
+      <Button className="text-sm rounded-full p0 w-[2.2rem]" variant="ghost">
         <TooltipComponent tooltipTrigger="⚙️" tooltipContent="Settings" />
         <span className="sr-only">Settings</span>
       </Button>
