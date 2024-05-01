@@ -110,7 +110,7 @@ const PDFSidebar = () => {
       </div>
       <div
         className={cn(
-          "flex pt-[1vh] pb-[2vh] h-full max-h-[88vh] overflow-y-scroll overflow-x-hidden",
+          "flex pt-[1vh] pb-[2vh] h-full max-h-[88vh] overflow-y-auto overflow-x-hidden",
           pdfFilesList.length === 0 && "overflow-y-hidden",
         )}
       >
