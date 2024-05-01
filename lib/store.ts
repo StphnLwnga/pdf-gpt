@@ -2,28 +2,24 @@ import { create } from 'zustand'
 import { Paper, Note } from './types'
 
 type State = {
-	currentPdfData: Partial<Paper & { pdfBuffer: Uint8Array }>,
-	pdfBuffersArray: { pdfUrl: string, pdfBuffer: Uint8Array }[],
+	activePdfId: string | null,
+	pdfBuffersArray: Paper[],
 }
 
 type Action = {
-	setCurrentPdfData: (currentPdfData: State['currentPdfData']) => void,
-	updateCurrentPdfData: (currentPdfData: State['currentPdfData']) => void,
-	removeCurrentPdfData: () => void,
-	setPdfBuffersArray: ({ pdfUrl, pdfBuffer }: { pdfUrl: string, pdfBuffer: Uint8Array }) => void,
+	setActivePdfId: (pdfId: string | null) => void,
+	setPdfBuffersArray: (paper: Paper) => void,
 }
 
 export const usePdfStore = create<State & Action>((set) => ({
-	currentPdfData: {},
-	setCurrentPdfData: (currentPdfData) => set({ currentPdfData }),
-	updateCurrentPdfData: (data) => set((state) => ({ currentPdfData: { ...state.currentPdfData, ...data } })),
-	removeCurrentPdfData: () => set({ currentPdfData: {} }),
+	activePdfId: null,
 	pdfBuffersArray: [],
-	setPdfBuffersArray: ({ pdfUrl, pdfBuffer }: { pdfUrl: string, pdfBuffer: Uint8Array }) => {
+	setActivePdfId: (pdfId: string | null) => set((state: State) => ({ activePdfId: pdfId, })),
+	setPdfBuffersArray: (paper: Paper) => {
 		set((state: State) => ({
 			pdfBuffersArray: [
 				...state.pdfBuffersArray,
-				{ pdfUrl, pdfBuffer },
+				paper,
 			],
 		}))
 	},
