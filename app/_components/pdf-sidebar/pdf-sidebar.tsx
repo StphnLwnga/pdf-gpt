@@ -33,7 +33,7 @@ const PDFSidebar = () => {
     const fetchPDFList = async (): Promise<void> => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`/api/doc/notes`,);
+        const {data} = await axios.get(`/api/doc/notes`,);
         setPdfList(data);
       } catch (error) {
         console.log(error);
@@ -55,7 +55,7 @@ const PDFSidebar = () => {
    */
   const handleListItemClick = (pdfTitle: string, pdfId: string): void => {
     setActiveItemId(pdfId);
-    router.push(`/doc/${pdfTitle.toLowerCase().replace(/ /g, "-")}`);
+    router.push(`/doc/${pdfId}`);
   };
 
   useEffect(() => {
