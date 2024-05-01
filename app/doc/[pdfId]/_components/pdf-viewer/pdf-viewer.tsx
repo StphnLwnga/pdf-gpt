@@ -16,33 +16,10 @@ import ErrorLoadingPDF from './error'
 
 import { loadPdfFromUrl } from '@/lib/helpers';
 
-const PDFViewer = ({ pdfId, pdfUrl }: { pdfId: string, pdfUrl: string }) => {
+const PDFViewer = ({ pdfDoc }: { pdfDoc: string }) => {
   const { resolvedTheme } = useTheme();
 
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
-
-  const { setPdfBuffersArray, pdfBuffersArray, updateCurrentPdfData, currentPdfData } = usePdfStore();
-
-  const [data, setData] = React.useState<Uint8Array|string>('');
-
-  // get pdf url from store otherwise load from URL and store in store 
-  useEffect(() => {
-    (async () => {
-      const pdfBufferExists = pdfBuffersArray.some((buffer) => buffer.pdfUrl === pdfUrl);
-      console.log({pdfBufferExists})
-      if (!pdfBufferExists) {
-        const data= await axios.post(`/api/doc/${pdfId}/view-doc`, { pdfUrl, });
-        console.log(data)
-        // setData(pdfBuffer)
-        // updateCurrentPdfData({ pdfBuffer, paper_url: pdfUrl });
-        // setPdfBuffersArray({ pdfUrl, pdfBuffer });
-      }
-    })();
-  }, [])
-
-  useEffect(() => {
-    console.log(currentPdfData);
-  }, [pdfBuffersArray, currentPdfData])
 
   return (
     <div className="h-full w-full p-4">
@@ -57,14 +34,17 @@ const PDFViewer = ({ pdfId, pdfUrl }: { pdfId: string, pdfUrl: string }) => {
               borderRadius: '5px',
             }}
           >
-            {data ? <Viewer
-              fileUrl={ data}
+            {/* {pdfDoc ?  */}
+            <Viewer
+              fileUrl={ `data:application/pdf;base64,${pdfDoc}` }
               enableSmoothScroll
               defaultScale={SpecialZoomLevel.PageFit}
               theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
               plugins={[defaultLayoutPluginInstance]}
               renderError={(error) => <ErrorLoadingPDF error={error} resolvedTheme={resolvedTheme} />}
-            />: <LoadingPDFViewer resolvedTheme={resolvedTheme} />}
+            />
+            {/* : <LoadingPDFViewer resolvedTheme={resolvedTheme} /> */}
+            {/* } */}
           </div>
         </Worker>
       </React.Suspense>
