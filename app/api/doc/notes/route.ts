@@ -72,10 +72,17 @@ export async function POST(req: Request): Promise<NextResponse> {
 		}
 
 		const path = `lib/mock.json`;
-		parsedPdfs.push(pdfData);
+		parsedPdfs.push({
+			id: pdfData.id,
+			paper_title: pdfData.paper_title,
+			paper_url: pdfData.paper_url,
+			paper_text: pdfData.paper_text,
+			created_at: pdfData.created_at,
+			notes: pdfData.notes,
+		});
 		fs.writeFileSync(path, JSON.stringify(parsedPdfs), "utf-8");
 
-		return NextResponse.json(pdfData, { status: 200 });
+		return NextResponse.json({ pdfId: pdfData.id }, { status: 200 });
 	} catch (error) {
 		console.log("[NOTES_GENERATE]", error);
 		return new NextResponse("Internal Error", { status: 500 });
@@ -100,7 +107,7 @@ export async function GET(req: Request): Promise<NextResponse> {
 		// Mock notes data
 		const pdfsStr = fs.readFileSync("lib/mock.json", "utf-8");
 		const parsedPdfs = JSON.parse(pdfsStr) as Paper[];
-		console.log(parsedPdfs)
+		// console.log(parsedPdfs)
 		const data = parsedPdfs.map((paper: Paper) => ({
 			id: paper.id,
 			paper_title: paper.paper_title,

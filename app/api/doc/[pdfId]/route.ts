@@ -24,3 +24,4 @@ export async function DELETE(req: Request, { params }: { params: { pdfId: string
     return new NextResponse("Internal Error", { status: 500 });
   }
 };
+
