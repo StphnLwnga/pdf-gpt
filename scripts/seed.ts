@@ -6,7 +6,7 @@ const database = new PrismaClient();
 
 async function main() {
 	try {
-		// await database.$connect();
+		await database.$connect();
 		// Call prisma to seed the database or other functions
 		console.log("Database seeded successfully");
 	} catch (error) {
