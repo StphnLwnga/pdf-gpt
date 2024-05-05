@@ -32,7 +32,7 @@ export default async function DocPage({ params, searchParams }: { params: { pdfI
 
   const pdfData: Paper = savedFiles.find((pdf: Paper) => pdf.id === pdfId);
 
-  const pdfDoc = await loadPdfFromUrl({ url: pdfData?.paper_url });
+  const pdfDoc = await loadPdfFromUrl({ url: pdfData?.pdf_url });
 
   if (!pdfData || !pdfId || !savedFiles.some((pdf: Paper) => pdf.id === pdfId)) redirect('/');
 

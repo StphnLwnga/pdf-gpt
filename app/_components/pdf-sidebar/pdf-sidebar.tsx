@@ -70,24 +70,24 @@ const PDFSidebar = () => {
       key={paper.id}
       isActiveItem={paper.id === activePdfId}
       isDarkTheme={resolvedTheme === "dark"}
-      pdfTitle={paper.paper_title}
-      pdfUrl={paper.paper_url}
-      onClick={() => handleListItemClick(paper.paper_title, paper.id)}
+      pdfTitle={paper.pdf_title}
+      pdfUrl={paper.pdf_url}
+      onClick={() => handleListItemClick(paper.pdf_title, paper.id)}
     />
   ));
 
   const handlePdfListSearch = useCallback(
     debounce((inputVal: string) => {
       if (inputVal !== "") {
-        const filteredList = [...pdfDocsArray].filter((pdf) => pdf.paper_title.toLowerCase().includes(inputVal.toLowerCase()));
+        const filteredList = [...pdfDocsArray].filter((pdf) => pdf.pdf_title.toLowerCase().includes(inputVal.toLowerCase()));
         const filteredListElems = filteredList.map((paper: Paper, i) => (
           <PDFSidebarListItem
             key={paper.id}
             isActiveItem={paper.id === activePdfId}
             isDarkTheme={resolvedTheme === "dark"}
-            pdfTitle={paper.paper_title}
-            pdfUrl={paper.paper_url}
-            onClick={() => handleListItemClick(paper.paper_title, paper.id)}
+            pdfTitle={paper.pdf_title}
+            pdfUrl={paper.pdf_url}
+            onClick={() => handleListItemClick(paper.pdf_title, paper.id)}
           />
         ));
         setFilteredPdfList(filteredListElems);

@@ -1,8 +1,8 @@
 export interface Paper {
   id: string;
-  paper_text: string;
-  paper_title: string;
-  paper_url: string;
+  pdf_text: string;
+  pdf_title: string;
+  pdf_url: string;
   created_at: string;
   notes: Array<Note>;
 }
