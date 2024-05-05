@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  // previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
@@ -14,4 +13,50 @@ datasource db {
   url          = env("DATABASE_URL")
   directUrl    = env("DIRECT_URL")
   relationMode = "prisma"
+}
+
+model PdfDocument {
+  id        String    @id @default(uuid())
+  pdf_title String
+  pdf_text  String
+  pdf_url   String
+  pdf_notes PdfNote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model PdfNote {
+  id          String @id @default(uuid())
+  note        String
+  pageNumbers Int[]
+
+  PdfDocument   PdfDocument? @relation(fields: [pdfDocumentId], references: [id])
+  pdfDocumentId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([pdfDocumentId])
+}
+
+model Document_Embeddings {
+  id        String                @id @default(uuid())
+  content   String
+  embedding Unsupported("vector")
+  metadata  Unsupported("Jsonb")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model Question_Answering {
+  id                String   @id @default(uuid())
+  question          String
+  answer            String
+  context           String
+  FollowupQuestions String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
 }
