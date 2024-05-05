@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
@@ -13,13 +14,14 @@ datasource db {
   url          = env("DATABASE_URL")
   directUrl    = env("DIRECT_URL")
   relationMode = "prisma"
+  extensions   = [pgvector(map: "vector")] // Add the pgvector extension
 }
 
 model PdfDocument {
   id        String    @id @default(uuid())
-  pdf_title String
+  pdf_title String    @unique
   pdf_text  String
-  pdf_url   String
+  pdf_url   String    @unique
   pdf_notes PdfNote[]
 
   createdAt DateTime @default(now())
@@ -41,10 +43,10 @@ model PdfNote {
 }
 
 model Document_Embeddings {
-  id        String                @id @default(uuid())
+  id        String                 @id @default(uuid())
   content   String
-  embedding Unsupported("vector")
-  metadata  Unsupported("Jsonb")
+  embedding Unsupported("vector")?
+  metadata  Unsupported("Jsonb")?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
