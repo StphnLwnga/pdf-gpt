@@ -18,11 +18,20 @@ const PDFSidebar = () => {
 
   const { resolvedTheme } = useTheme();
 
-  const { activePdfId, pdfDocsArray, loadingDoc, setActivePdfId, setPdfDocsArray, setLoadingDoc } = usePdfStore();
+  const {
+    activePdfId,
+    pdfDocsArray,
+    loadingDoc,
+    setActivePdfId,
+    setPdfDocsArray,
+    setLoadingDoc,
+  } = usePdfStore();
 
   const inputElement = useRef<null | HTMLInputElement>(null);
 
-  const [filteredPdfList, setFilteredPdfList] = useState<JSX.Element[] | null>();
+  const [filteredPdfList, setFilteredPdfList] = useState<
+    JSX.Element[] | null
+  >();
   const [loading, setLoading] = useState<boolean>(false);
   const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
@@ -39,8 +48,9 @@ const PDFSidebar = () => {
     (async (): Promise<void> => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`/api/doc/notes`,);
+        const { data } = await axios.get(`/api/doc/notes`);
         // setPdfList(data);
+        // console.log(data);
         setPdfDocsArray(data as Paper[]);
       } catch (error) {
         console.log(error);
@@ -79,7 +89,9 @@ const PDFSidebar = () => {
   const handlePdfListSearch = useCallback(
     debounce((inputVal: string) => {
       if (inputVal !== "") {
-        const filteredList = [...pdfDocsArray].filter((pdf) => pdf.pdf_title.toLowerCase().includes(inputVal.toLowerCase()));
+        const filteredList = [...pdfDocsArray].filter((pdf) =>
+          pdf.pdf_title.toLowerCase().includes(inputVal.toLowerCase()),
+        );
         const filteredListElems = filteredList.map((paper: Paper, i) => (
           <PDFSidebarListItem
             key={paper.id}
@@ -126,7 +138,8 @@ const PDFSidebar = () => {
           </ul>
         )}
 
-        {loading || (pdfFilesList.length === 0 && !fetchAttempted) && <LoadingSidebar />}
+        {loading ||
+          (pdfFilesList.length === 0 && !fetchAttempted && <LoadingSidebar />)}
 
         {fetchAttempted && !loading && pdfFilesList.length === 0 && (
           <span className="text-xs italic">
