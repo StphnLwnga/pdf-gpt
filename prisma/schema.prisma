@@ -18,11 +18,12 @@ datasource db {
 }
 
 model PdfDocument {
-  id        String    @id @default(uuid())
-  pdf_title String    @unique
+  id        String               @id @default(uuid())
+  pdf_title String               @unique
   pdf_text  String
-  pdf_url   String    @unique
+  pdf_url   String               @unique
   pdf_notes PdfNote[]
+  q_as      Question_Answering[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
@@ -59,6 +60,11 @@ model Question_Answering {
   context           String
   FollowupQuestions String[]
 
+  PdfDocument   PdfDocument? @relation(fields: [pdfDocumentId], references: [id])
+  pdfDocumentId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+
+  @@index([pdfDocumentId])
 }
