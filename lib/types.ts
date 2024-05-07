@@ -4,10 +4,10 @@ export interface Paper {
   pdf_title: string;
   pdf_url: string;
   created_at: string;
-  notes: Array<Note>;
+  notes: Array<PdfNote>;
 }
 
-export interface Note {
+export interface PdfNote {
   note: string;
-  page_numbers: Array<number>;
+  pageNumbers: Array<number>;
 }
