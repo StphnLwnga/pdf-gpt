@@ -7,6 +7,14 @@ import { Document } from "langchain/document";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { UnstructuredLoader } from "langchain/document_loaders/fs/unstructured";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { PdfNote } from "@prisma/client";
+import { formatDocumentsAsString } from "langchain/util/document";
+import { model } from "./model";
+import {
+  NOTES_TOOL_SCHEMA,
+  NOTE_PROMPT,
+  outputParser,
+} from "./prompts/note-prompt";
 
 /**
  * Loads a PDF file from a given URL.
@@ -62,17 +70,18 @@ export async function convertPdfToDocuments(
   pdf: Buffer,
   pdfTitle: string,
 ): Promise<Document[]> {
-  if (!process.env.UNSTRUCTURED_API_KEY) throw new Error();
+  if (!process.env.UNSTRUCTURED_API_KEY)
+    throw new Error("Missing Unstructured API key");
 
   // create file name for each Document created from the PDF using UUIDv4
   const fileName = pdfTitle.toLowerCase().replace(/ /g, "-");
 
   // check if folder exists
-  if (!fs.existsSync("pdf")) fs.mkdirSync("pdfs");
+  if (!fs.existsSync("pdfs")) fs.mkdirSync("pdfs");
 
   const pdfPath = `pdfs/${fileName}.pdf`;
   // Save Document to file
-  fs.writeFileSync(pdfPath, pdf, "binary");
+  if (!fs.existsSync(pdfPath)) fs.writeFileSync(pdfPath, pdf, "binary");
 
   // const loader = new PDFLoader(pdfPath);
   // Use with PDFLoader
@@ -85,18 +94,50 @@ export async function convertPdfToDocuments(
   // create Unstructured loader if Unstructured API key is provided
   const loader = new UnstructuredLoader(pdfPath, {
     apiKey: process.env.UNSTRUCTURED_API_KEY,
-    apiUrl: process.env.UNSTRUCTURED_NGROK_DIRECT_URL,
+    apiUrl: process.env.UNSTRUCTURED_DIRECT_URL,
     strategy: "hi_res",
   });
 
   try {
     const docs = await loader.load();
-    // delete temporary PDF file
-    fs.unlinkSync(pdfPath);
     console.log("PDF converted successfully 🔀🔀");
     return docs;
   } catch (error) {
     console.log(error);
     throw new Error("PDF to Document conversion failed 🩻");
+  } finally {
+    // delete temporary PDF file
+    fs.unlinkSync(pdfPath);
+  }
+}
+
+/**
+ * Generate notes based on the provided documents.
+ *
+ * @param {Array<Document>} documents - array of documents
+ * @return {Promise<any>} the result of generating notes
+ */
+async function generateNotes(
+  url: string,
+  documents: Array<Document>,
+): Promise<Array<PdfNote>> {
+  try {
+    const documentAsStr = formatDocumentsAsString(documents);
+
+    const modelWithTool = model.bind({
+      tools: [NOTES_TOOL_SCHEMA],
+    });
+
+    const chain = NOTE_PROMPT.pipe(modelWithTool).pipe(outputParser);
+
+    const notes = await chain.invoke({ paper: documentAsStr });
+
+    // Save notes locally
+    // saveNotesLocally(url, notes);
+
+    return notes;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Notes generation failed 🩻");
   }
 }
