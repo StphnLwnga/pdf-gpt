@@ -8,7 +8,8 @@ export const urlSchema = z.string().refine(
       `^(http|https)://(?!localhost|127\.0\.0\.1)(.*?\.pdf)$`,
     );
 
-    return value.endsWith(".pdf") && urlRegEx.test(value);
+    // return value.endsWith(".pdf") && urlRegEx.test(value);
+    return true;
   },
   {
     // Custom error message
