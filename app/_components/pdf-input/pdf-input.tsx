@@ -53,24 +53,22 @@ const PDFInput = () => {
   });
 
   const handleLinkSubmit2 = async (value: z.infer<typeof formSchema>) => {
+    console.log(value);
     setLoadingDoc(true);
-    setValidationError("");
     try {
       console.log("Fetching PDF link");
       const response = await axios.post(`/api/doc/notes`, {
         pdfUrl: value,
         pdfTitle: `Testing PDF title`,
       });
-      const { data } = response;
+      // const { data } = response;
       // setCurrentPdfData(data);
       // return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
     } catch (error) {
       console.log(error);
-      if (error instanceof ZodError)
-        setValidationError(JSON.parse(error.toString())[0].message);
-      setLoadingDoc(false);
     } finally {
       setFormSubmitted(true);
+      setLoadingDoc(false);
     }
   };
 
@@ -123,13 +121,22 @@ const PDFInput = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input
-                              className="w-[36vw]"
-                              placeholder={
-                                tab === "pasteLink" ? "Link here 🔗..." : ""
-                              }
-                              {...field}
-                            />
+                            {tab === "pasteLink" ? (
+                              <Input
+                                className="w-[36vw]"
+                                type={tab === "pasteLink" ? "text" : "file"}
+                                placeholder={
+                                  tab === "pasteLink" ? "Link here 🔗..." : ""
+                                }
+                                {...field}
+                              />
+                            ) : (
+                              <Input
+                                className="w-[36vw]"
+                                type="file"
+                                {...field}
+                              />
+                            )}
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -166,11 +173,6 @@ const PDFInput = () => {
                   </Button>
                 </div> */}
                 <div className="text-sm flex flex-col w-[40vw] max-w-[40vw]">
-                  {!!validationError && (
-                    <span className="py-2 text-red-500 text-sm">
-                      {validationError}
-                    </span>
-                  )}
                   <Collapsible
                     open={isOpen}
                     onOpenChange={setIsOpen}
