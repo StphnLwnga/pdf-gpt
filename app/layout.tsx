@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/resizable";
 import SettingsIcons from "@/components/settings-icons";
 
+import "@uploadthing/react/styles.css";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

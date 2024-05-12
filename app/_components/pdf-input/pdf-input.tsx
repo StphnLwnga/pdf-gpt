@@ -7,10 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { ChevronsUpDown } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { usePdfStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { Input } from "@/components/ui/input";
 import {
   Collapsible,
@@ -27,6 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { FormControl, FormLabel } from "@mui/material";
+import FileUpload from "@/components/file-upload";
 
 /**
  * Use Zod for input validation
@@ -42,8 +46,10 @@ const PDFInput = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [pastedLink, setPastedLink] = useState("");
   const [pagesToDelete, setPagesToDelete] = useState("");
-  const [validationError, setValidationError] = useState("");
-  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const { toast } = useToast();
+
+  const { resolvedTheme } = useTheme();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,7 +58,11 @@ const PDFInput = () => {
     },
   });
 
-  const handleLinkSubmit2 = async (value: z.infer<typeof formSchema>) => {
+  const reset = () => router.refresh();
+
+  const handleLinkSubmit2 = async (
+    value: z.infer<typeof formSchema>,
+  ): Promise<void> => {
     console.log(value);
     setLoadingDoc(true);
     try {
@@ -67,35 +77,39 @@ const PDFInput = () => {
     } catch (error) {
       console.log(error);
     } finally {
-      setFormSubmitted(true);
       setLoadingDoc(false);
     }
   };
 
-  const handleLinkSubmit = async () => {
-    setLoadingDoc(true);
-    setValidationError("");
+  const handleFileUpload = async (
+    data: z.infer<typeof formSchema>,
+  ): Promise<void> => {
     try {
-      console.log("Fetching PDF link");
-      const validatedLink = urlSchema.parse(pastedLink);
-      const response = await axios.post(`/api/doc/notes`, {
-        pdfUrl: validatedLink,
-        pdfTitle: `Testing PDF title`,
-      });
-      const { data } = response;
-      // setCurrentPdfData(data);
-      // return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
+      console.log(data);
+      // await axios.post(`/api/courses/doc/notes`, data);
+      // toast({
+      //   title: "Success",
+      //   description: "Resource successfully added!",
+      //   className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
+      // });
+      // router.refresh();
     } catch (error) {
-      console.log(error);
-      if (error instanceof ZodError)
-        setValidationError(JSON.parse(error.toString())[0].message);
-      setLoadingDoc(false);
+      console.log("[COURSEID_ATT_ADD]", error);
+      // toast({
+      //   title: "Error",
+      //   description: "Something went wrong!",
+      //   variant: "destructive",
+      //   action: (
+      //     <ToastAction onClick={reset} altText="Try again">
+      //       Try again
+      //     </ToastAction>
+      //   ),
+      // });
     }
   };
 
   useEffect(() => {
     console.log(pastedLink, pagesToDelete);
-    !!pastedLink && setValidationError("");
   }, [pastedLink, pagesToDelete]);
 
   return (
@@ -110,18 +124,18 @@ const PDFInput = () => {
             </TabsList>
             {["pasteLink", "uploadPdf"].map((tab, i) => (
               <TabsContent value={tab} key={`tab-${i}`}>
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(handleLinkSubmit2)}
-                    className="flex justify-center w-[40vw] items-center space-x-2 font-mono italic pt-4"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="urlValue"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            {tab === "pasteLink" ? (
+                {tab === "pasteLink" ? (
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(handleLinkSubmit2)}
+                      className="flex justify-center w-[40vw] items-center space-x-2 font-mono italic pt-4"
+                    >
+                      <FormField
+                        control={form.control}
+                        name="urlValue"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
                               <Input
                                 className="w-[36vw]"
                                 type={tab === "pasteLink" ? "text" : "file"}
@@ -130,27 +144,30 @@ const PDFInput = () => {
                                 }
                                 {...field}
                               />
-                            ) : (
-                              <Input
-                                className="w-[36vw]"
-                                type="file"
-                                {...field}
-                              />
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="submit"
-                      className="text-xl rounded-full p-1"
-                      variant="ghost"
-                    >
-                      🪄
-                    </Button>
-                  </form>
-                </Form>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="submit"
+                        className="text-xl rounded-full p-1"
+                        variant="ghost"
+                      >
+                        🪄
+                      </Button>
+                    </form>
+                  </Form>
+                ) : (
+                  <FileUpload
+                    endpoint="pdfUpload"
+                    onChange={(url) => {
+                      console.log(url);
+                      if (url) handleFileUpload({ urlValue: url });
+                    }}
+                  />
+                )}
+
                 {/* <div className="flex w-[40vw] items-center space-x-2 font-mono italic">
                   <Input
                     placeholder={tab === "pasteLink" ? "Link here 🔗..." : ""}
