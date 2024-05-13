@@ -5,6 +5,8 @@ const nextConfig = {
       "images.unsplash.com",
       "images.clerk.dev",
       "img.freepik.com",
+      "uploadthing.com",
+      "n4lth2-3000.csb.app",
       "*",
     ],
   },

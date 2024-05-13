@@ -11,9 +11,15 @@ const f = createUploadthing();
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
-  pdfUpload: f(["text", "pdf"])
+  pdfUpload: f({
+    pdf: { maxFileSize: "16MB", maxFileCount: 1 },
+    text: { maxFileSize: "16MB", maxFileCount: 1 },
+  })
     // .middleware(() => handleAuth())
-    .onUploadComplete(() => {}),
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log({ metadata, file });
+      return { metadata, file };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;
