@@ -163,32 +163,10 @@ const PDFInput = () => {
                     endpoint="pdfUpload"
                     onChange={(url) => {
                       console.log(url);
-                      if (url) handleFileUpload({ urlValue: url });
+                      // if (url) handleFileUpload({ urlValue: url });
                     }}
                   />
                 )}
-
-                {/* <div className="flex w-[40vw] items-center space-x-2 font-mono italic">
-                  <Input
-                    placeholder={tab === "pasteLink" ? "Link here 🔗..." : ""}
-                    className="w-[40vw]"
-                    type={tab === "pasteLink" ? "text" : "file"}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setPastedLink(e.target.value)
-                    }
-                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                      e.key === "Enter" && !!pastedLink && handleLinkSubmit();
-                    }}
-                  />
-                  <Button
-                    type="submit"
-                    className="text-xl rounded-full p-1"
-                    variant="ghost"
-                    onClick={handleLinkSubmit}
-                  >
-                    🪄
-                  </Button>
-                </div> */}
                 <div className="text-sm flex flex-col w-[40vw] max-w-[40vw]">
                   <Collapsible
                     open={isOpen}
