@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { UploadDropzone } from "@/lib/uploadthing";
-import { ourFileRouter } from "@/app/api/uploadthing/core";
+import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
+import { OurFileRouter, ourFileRouter } from "@/app/api/uploadthing/core";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useTheme } from "next-themes";
@@ -24,9 +24,19 @@ const FileUpload = ({ onChange, endpoint }: FileUploadProps): JSX.Element => {
     <UploadDropzone
       endpoint={endpoint}
       onClientUploadComplete={(res) => {
-        console.log({ res });
-        onChange(res?.[0].url);
+        console.log(res);
+        // onChange(res?.[0].url);
       }}
+      // onBeforeUploadBegin={(files) => {
+      //   // Preprocess files before uploading (e.g. rename them)
+      //   return files.map(
+      //     (f) => new File([f], "renamed-" + f.name, { type: f.type }),
+      //   );
+      // }}
+      // onUploadBegin={(name) => {
+      //   // Do something once upload begins
+      //   console.log("Uploading: ", name);
+      // }}
       onUploadError={(err) =>
         toast({
           title: "Error",
