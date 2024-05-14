@@ -2,14 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
-import { OurFileRouter, ourFileRouter } from "@/app/api/uploadthing/core";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
 
 interface FileUploadProps {
-  onChange: (url?: string) => void;
+  onChange: (data: Record<string, any>) => void;
   endpoint: keyof typeof ourFileRouter;
 }
 
@@ -24,19 +23,15 @@ const FileUpload = ({ onChange, endpoint }: FileUploadProps): JSX.Element => {
     <UploadDropzone
       endpoint={endpoint}
       onClientUploadComplete={(res) => {
-        console.log(res);
-        // onChange(res?.[0].url);
+        toast({
+          title: "Success",
+          description: `Successfully uploaded ${res?.[0].name}`,
+          className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
+        });
+        // console.log(res);
+        const { name, url } = res?.[0];
+        onChange({ name, url });
       }}
-      // onBeforeUploadBegin={(files) => {
-      //   // Preprocess files before uploading (e.g. rename them)
-      //   return files.map(
-      //     (f) => new File([f], "renamed-" + f.name, { type: f.type }),
-      //   );
-      // }}
-      // onUploadBegin={(name) => {
-      //   // Do something once upload begins
-      //   console.log("Uploading: ", name);
-      // }}
       onUploadError={(err) =>
         toast({
           title: "Error",

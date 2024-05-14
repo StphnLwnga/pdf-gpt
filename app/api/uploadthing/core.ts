@@ -17,8 +17,8 @@ export const ourFileRouter = {
   })
     // .middleware(() => handleAuth())
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log({ metadata, file });
-      return { metadata, file };
+      // console.log({ metadata, file });
+      return { metadata, ...file };
     }),
 } satisfies FileRouter;
 
