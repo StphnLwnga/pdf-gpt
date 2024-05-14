@@ -8,7 +8,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { useTheme } from "next-themes";
 
 interface FileUploadProps {
-  onChange: (data: Record<string, any>) => void;
+  onChange: (data: { url: string; name?: string }) => void;
   endpoint: keyof typeof ourFileRouter;
 }
 

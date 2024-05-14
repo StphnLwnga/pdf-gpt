@@ -61,7 +61,7 @@ const PDFInput = () => {
   const reset = () => router.refresh();
 
   const handleLinkSubmit2 = async (
-    value: z.infer<typeof formSchema>,
+    value: z.infer<typeof formSchema>["urlValue"],
     name?: string,
   ): Promise<void> => {
     console.log(value);
@@ -97,7 +97,7 @@ const PDFInput = () => {
   };
 
   const handleFileUpload = async (data: {
-    url: z.infer<typeof formSchema>;
+    url: z.infer<typeof formSchema>["urlValue"];
     name?: string;
   }): Promise<void> => {
     setLoadingDoc(true);
