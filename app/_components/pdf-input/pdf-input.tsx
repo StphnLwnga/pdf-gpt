@@ -62,6 +62,7 @@ const PDFInput = () => {
 
   const handleLinkSubmit2 = async (
     value: z.infer<typeof formSchema>,
+    name?: string,
   ): Promise<void> => {
     console.log(value);
     setLoadingDoc(true);
@@ -69,42 +70,55 @@ const PDFInput = () => {
       console.log("Fetching PDF link");
       const response = await axios.post(`/api/doc/notes`, {
         pdfUrl: value,
-        pdfTitle: `Testing PDF title`,
+        pdfTitle: name ?? value,
       });
       // const { data } = response;
       // setCurrentPdfData(data);
+      //   title: "Success",
+      //   description: "Resource successfully added!",
+      //   className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
+      // });
       // return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
     } catch (error) {
       console.log(error);
+      toast({
+        title: "Error",
+        description: "Something went wrong!",
+        variant: "destructive",
+        action: (
+          <ToastAction onClick={reset} altText="Try again">
+            Try again
+          </ToastAction>
+        ),
+      });
     } finally {
       setLoadingDoc(false);
     }
   };
 
-  const handleFileUpload = async (
-    data: z.infer<typeof formSchema>,
-  ): Promise<void> => {
+  const handleFileUpload = async (data: {
+    url: z.infer<typeof formSchema>;
+    name?: string;
+  }): Promise<void> => {
+    setLoadingDoc(true);
+    const { url, name } = data;
     try {
       console.log(data);
-      // await axios.post(`/api/courses/doc/notes`, data);
-      // toast({
-      //   title: "Success",
-      //   description: "Resource successfully added!",
-      //   className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
-      // });
-      // router.refresh();
+      handleLinkSubmit2(url, name);
     } catch (error) {
       console.log("[COURSEID_ATT_ADD]", error);
-      // toast({
-      //   title: "Error",
-      //   description: "Something went wrong!",
-      //   variant: "destructive",
-      //   action: (
-      //     <ToastAction onClick={reset} altText="Try again">
-      //       Try again
-      //     </ToastAction>
-      //   ),
-      // });
+      toast({
+        title: "Error",
+        description: "File upload failed!",
+        variant: "destructive",
+        action: (
+          <ToastAction onClick={reset} altText="Try again">
+            Try again
+          </ToastAction>
+        ),
+      });
+    } finally {
+      setLoadingDoc(false);
     }
   };
 
@@ -161,9 +175,8 @@ const PDFInput = () => {
                 ) : (
                   <FileUpload
                     endpoint="pdfUpload"
-                    onChange={(url) => {
-                      console.log(url);
-                      // if (url) handleFileUpload({ urlValue: url });
+                    onChange={(data) => {
+                      if (data.url) handleFileUpload(data);
                     }}
                   />
                 )}

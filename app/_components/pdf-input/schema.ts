@@ -5,7 +5,7 @@ import { z } from "zod";
 export const urlSchema = z.string().refine(
   (value) => {
     const urlRegEx = new RegExp(
-      `^(http|https)://(?!localhost|127\.0\.0\.1)(.*?\.pdf)$`,
+      `^(http|https)://(?!localhost|127\.0\.0\.1)(.*?)$`,
     );
 
     // return value.endsWith(".pdf") && urlRegEx.test(value);
