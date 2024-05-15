@@ -44,7 +44,7 @@ const PDFInput = () => {
   const { clearErrors } = useForm<{ urlValue: string }>();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [pastedLink, setPastedLink] = useState("");
+  const [pdfName, setPdfName] = useState("");
   const [pagesToDelete, setPagesToDelete] = useState("");
 
   const { toast } = useToast();
@@ -58,19 +58,23 @@ const PDFInput = () => {
     },
   });
 
-  const reset = () => router.refresh();
+  const reset = () => {
+    setPdfName("");
+    router.refresh();
+  };
 
-  const handleLinkSubmit2 = async (
-    value: z.infer<typeof formSchema>["urlValue"],
-    name?: string,
-  ): Promise<void> => {
-    console.log(value);
+  const handleLinkSubmit2 = async ({
+    urlValue,
+  }: z.infer<typeof formSchema>): Promise<void> => {
+    console.log(urlValue, pdfName);
     setLoadingDoc(true);
+    const name = !!pdfName ? pdfName : urlValue.split("/").slice(-2).join("-");
     try {
       console.log("Fetching PDF link");
+      // console.log(urlSchema.parse(urlValue));
       const response = await axios.post(`/api/doc/notes`, {
-        pdfUrl: value,
-        pdfTitle: name ?? value,
+        pdfUrl: urlValue,
+        pdfTitle: name,
       });
       // const { data } = response;
       // setCurrentPdfData(data);
@@ -79,11 +83,11 @@ const PDFInput = () => {
       //   className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
       // });
       // return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       toast({
-        title: "Error",
-        description: "Something went wrong!",
+        title: "🚫️ Failed to fetch PDF!",
+        description: error.message,
         variant: "destructive",
         action: (
           <ToastAction onClick={reset} altText="Try again">
@@ -93,23 +97,23 @@ const PDFInput = () => {
       });
     } finally {
       setLoadingDoc(false);
+      setPdfName("");
     }
   };
 
   const handleFileUpload = async (data: {
-    url: z.infer<typeof formSchema>["urlValue"];
-    name?: string;
+    url: string;
+    name: string;
   }): Promise<void> => {
-    setLoadingDoc(true);
     const { url, name } = data;
     try {
       console.log(data);
-      handleLinkSubmit2(url, name);
+      setPdfName(name);
+      handleLinkSubmit2({ urlValue: url });
     } catch (error) {
       console.log("[COURSEID_ATT_ADD]", error);
       toast({
-        title: "Error",
-        description: "File upload failed!",
+        title: "🚫️ File upload failed!",
         variant: "destructive",
         action: (
           <ToastAction onClick={reset} altText="Try again">
@@ -117,14 +121,12 @@ const PDFInput = () => {
           </ToastAction>
         ),
       });
-    } finally {
-      setLoadingDoc(false);
     }
   };
 
   useEffect(() => {
-    console.log(pastedLink, pagesToDelete);
-  }, [pastedLink, pagesToDelete]);
+    console.log(pagesToDelete);
+  }, [pagesToDelete]);
 
   return (
     <div className="h-full w-full">
@@ -176,7 +178,9 @@ const PDFInput = () => {
                   <FileUpload
                     endpoint="pdfUpload"
                     onChange={(data) => {
-                      if (data.url) handleFileUpload(data);
+                      if (data.url) {
+                        handleFileUpload(data as { url: string; name: string });
+                      }
                     }}
                   />
                 )}
