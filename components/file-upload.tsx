@@ -6,6 +6,7 @@ import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useTheme } from "next-themes";
+import { usePdfStore } from "@/lib/store";
 
 interface FileUploadProps {
   onChange: (data: { url: string; name?: string }) => void;
@@ -15,6 +16,8 @@ interface FileUploadProps {
 const FileUpload = ({ onChange, endpoint }: FileUploadProps): JSX.Element => {
   const router = useRouter();
 
+  const { setLoadingDoc } = usePdfStore();
+
   const { toast } = useToast();
 
   const { resolvedTheme } = useTheme();
@@ -22,6 +25,7 @@ const FileUpload = ({ onChange, endpoint }: FileUploadProps): JSX.Element => {
   return (
     <UploadDropzone
       endpoint={endpoint}
+      onUploadBegin={() => setLoadingDoc(true)}
       onClientUploadComplete={(res) => {
         toast({
           title: "Success",
@@ -32,13 +36,14 @@ const FileUpload = ({ onChange, endpoint }: FileUploadProps): JSX.Element => {
         const { name, url } = res?.[0];
         onChange({ name, url });
       }}
-      onUploadError={(err) =>
+      onUploadError={(err) => {
+        setLoadingDoc(false);
         toast({
           title: "Error",
           description: err?.message,
           variant: "destructive",
-        })
-      }
+        });
+      }}
       appearance={{
         label: {
           color: resolvedTheme === "dark" ? "#cbd5e1" : "rgb(71 85 105)",
