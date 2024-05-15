@@ -25,8 +25,6 @@ import { db, prismaVectorStore } from "@/lib/database/db";
  * @return {Promise<NextResponse>} A promise that resolves to a NextResponse object.
  */
 export async function POST(req: Request): Promise<NextResponse> {
-  const parsedPdfs = JSON.parse(fs.readFileSync("lib/mock.json", "utf-8"));
-
   try {
     // const { userId } = auth();
     // if (!userId) throw new Error("Unauthorized");
@@ -58,23 +56,21 @@ export async function POST(req: Request): Promise<NextResponse> {
         { status: 200 },
       );
 
-    const pdfAsBuffer = await loadPdfFromUrl({ url: pdfUrl });
+    // const pdfAsBuffer = await loadPdfFromUrl({ url: pdfUrl });
 
-    const docs = await convertPdfToDocuments(pdfAsBuffer, pdfTitle);
-    console.log(docs);
+    // const docs = await convertPdfToDocuments(pdfAsBuffer, pdfTitle);
+    // console.log(docs);
 
-    if (!docs) return new NextResponse("PDF not saved", { status: 400 });
+    // if (!docs) return new NextResponse("PDF not saved", { status: 400 });
 
-    // const pdfDocument = await db.pdfDocument.create({
-    //   data: {
-    //     pdf_url: pdfUrl,
-    //     pdf_title: pdfTitle,
-    //   },
-    // });
+    const pdfDocument = await db.pdfDocument.create({
+      data: {
+        pdf_url: pdfUrl,
+        pdf_title: pdfTitle,
+      },
+    });
 
-    // return NextResponse.json({ pdfId: pdfData.id }, { status: 200 });
-
-    return NextResponse.json({});
+    return NextResponse.json({ pdfId: pdfDocument.id }, { status: 200 });
   } catch (error) {
     console.log("[NOTES_GENERATE]", error);
     return new NextResponse("Internal Error", { status: 500 });
@@ -92,28 +88,20 @@ export async function GET(req: Request): Promise<NextResponse> {
     // const { userId } = auth();
     // if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
-    /**
-     * Retrieve all the PDF files and associated QA chat history from the database.
-     */
+    const pdfDocuments = await db.pdfDocument.findMany({
+      select: {
+        id: true,
+        pdf_url: true,
+        pdf_title: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-    // Mock notes data
-    const pdfsStr = fs.readFileSync("lib/mock.json", "utf-8");
-    const parsedPdfs = JSON.parse(pdfsStr) as Paper[];
-    // console.log(parsedPdfs)
-    const data = parsedPdfs.map(
-      (paper: Paper) =>
-        ({
-          id: paper.id,
-          pdf_title: paper.pdf_title,
-          pdf_url: paper.pdf_url,
-          created_at: paper.created_at,
-        }) as Partial<Paper>,
-    );
-
-    data.sort((a, b) => b?.created_at!.localeCompare(a?.created_at!));
-    return NextResponse.json(data);
+    return NextResponse.json(pdfDocuments);
   } catch (error) {
-    console.log("[NOTES_GET]", error);
+    console.log("[FILES_LIST]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

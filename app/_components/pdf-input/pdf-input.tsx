@@ -76,12 +76,26 @@ const PDFInput = () => {
         pdfUrl: urlValue,
         pdfTitle: name,
       });
-      // const { data } = response;
-      // setCurrentPdfData(data);
-      //   title: "Success",
-      //   description: "Resource successfully added!",
-      //   className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
-      // });
+      const { data } = response;
+      console.log(data);
+      if (data.pdfExists) {
+        toast({
+          title: "🗃️ Resource already exists",
+          className: `border-yellow-300 text-primary bg-yellow-300/75 border-0 border-slate-200`,
+        });
+      }
+
+      if (data.pdfId && !data.pdfExists) {
+        toast({
+          title: "Success",
+          description: "Resource successfully added!",
+          className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
+        });
+      }
+
+      if (data.pdfId) {
+        router.refresh();
+      }
       // return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
     } catch (error: any) {
       console.log(error);
@@ -97,7 +111,6 @@ const PDFInput = () => {
       });
     } finally {
       setLoadingDoc(false);
-      setPdfName("");
     }
   };
 
@@ -105,11 +118,35 @@ const PDFInput = () => {
     url: string;
     name: string;
   }): Promise<void> => {
+    setLoadingDoc(true);
     const { url, name } = data;
     try {
+      const response = await axios.post(`/api/doc/notes`, {
+        pdfUrl: url,
+        pdfTitle: name,
+      });
+      const { data } = response;
       console.log(data);
-      setPdfName(name);
-      handleLinkSubmit2({ urlValue: url });
+      if (data.pdfExists) {
+        toast({
+          title: "🗃️ Resource already exists",
+          className: `border-yellow-300 text-primary bg-yellow-300/75 border-0 border-slate-200`,
+        });
+      }
+
+      if (data.pdfId && !data.pdfExists) {
+        toast({
+          title: "Success",
+          description: "Resource successfully added!",
+          className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
+        });
+      }
+
+      if (data.pdfId) {
+        router.refresh();
+      }
+      // return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
+      // router.refresh();
     } catch (error) {
       console.log("[COURSEID_ATT_ADD]", error);
       toast({
@@ -121,6 +158,8 @@ const PDFInput = () => {
           </ToastAction>
         ),
       });
+    } finally {
+      setLoadingDoc(false);
     }
   };
 

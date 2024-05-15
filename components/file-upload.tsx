@@ -27,12 +27,12 @@ const FileUpload = ({ onChange, endpoint }: FileUploadProps): JSX.Element => {
       endpoint={endpoint}
       onUploadBegin={() => setLoadingDoc(true)}
       onClientUploadComplete={(res) => {
-        toast({
-          title: "Success",
-          description: `Successfully uploaded ${res?.[0].name}`,
-          className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
-        });
-        // console.log(res);
+        // toast({
+        //   title: "Success",
+        //   description: `Successfully uploaded ${res?.[0].name}`,
+        //   className: `${resolvedTheme === "dark" ? "bg-emerald-500" : "bg-emerald-500 text-slate-100"} border-0 border-slate-200`,
+        // });
+        console.log(res);
         const { name, url } = res?.[0];
         onChange({ name, url });
       }}
