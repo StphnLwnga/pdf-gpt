@@ -1,16 +1,17 @@
 import { create } from "zustand";
 import { Paper } from "./types";
+import { PdfDocument } from "@prisma/client";
 
 type State = {
   activePdfId: string | null;
-  pdfDocsArray: Paper[];
+  pdfDocsArray: Partial<PdfDocument>[];
   loadingDoc: boolean;
 };
 
 type Action = {
   setActivePdfId: (pdfId: string | null) => void;
-  setPdfDocsArray: (pdfDocs: Paper[]) => void;
-  updatePdfDocsArray: (pdfDoc: Paper) => void;
+  setPdfDocsArray: (pdfDocs: Partial<PdfDocument>[]) => void;
+  updatePdfDocsArray: (pdfDoc: Partial<PdfDocument>) => void;
   setLoadingDoc: (loadingDoc: boolean) => void;
 };
 
@@ -20,11 +21,11 @@ export const usePdfStore = create<State & Action>((set) => ({
   loadingDoc: false,
   setActivePdfId: (pdfId: string | null) =>
     set((state: State) => ({ activePdfId: pdfId })),
-  setPdfDocsArray: (pdfDocs: Paper[]) =>
+  setPdfDocsArray: (pdfDocs: Partial<PdfDocument>[]) =>
     set((state: State) => ({ pdfDocsArray: pdfDocs })),
-  updatePdfDocsArray: (pdfDoc: Paper) => {
+  updatePdfDocsArray: (pdfDoc: Partial<PdfDocument>) => {
     set((state: State) => ({
-      pdfDocsArray: [...state.pdfDocsArray, pdfDoc],
+      pdfDocsArray: [pdfDoc, ...state.pdfDocsArray],
     }));
   },
   setLoadingDoc: (loadingDoc) => set((state: State) => ({ loadingDoc })),
