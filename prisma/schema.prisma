@@ -20,7 +20,7 @@ datasource db {
 model PdfDocument {
   id        String               @id @default(uuid())
   pdf_title String               @unique
-  pdf_text  String
+  pdf_text  String?
   pdf_url   String               @unique
   pdf_notes PdfNote[]
   q_as      Question_Answering[]
