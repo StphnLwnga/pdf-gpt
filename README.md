@@ -32,6 +32,8 @@ Click `🔌 connect` in the top right corner. In the opened dialog, navigate to 
 
 Copy the values of **`DATABASE_URL`** and **`DIRECT_URL`** from **`.env.local`** into your `.env` file.
 
+Add `?pgbouncer=true&connection_limit=1` to the end of **`DATABASE_URL`** connection string.
+
 ### Prisma Setup
 
 Push the schema to the database and generate a Prisma client
