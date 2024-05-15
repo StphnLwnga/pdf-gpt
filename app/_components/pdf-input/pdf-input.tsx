@@ -39,7 +39,7 @@ import FileUpload from "@/components/file-upload";
 const PDFInput = () => {
   const router = useRouter();
 
-  const { loadingDoc, setLoadingDoc } = usePdfStore();
+  const { loadingDoc, setLoadingDoc, updatePdfDocsArray } = usePdfStore();
 
   const { clearErrors } = useForm<{ urlValue: string }>();
 
@@ -85,7 +85,7 @@ const PDFInput = () => {
         });
       }
 
-      if (data.pdfId && !data.pdfExists) {
+      if (data.id && !data.pdfExists) {
         toast({
           title: "Success",
           description: "Resource successfully added!",
@@ -93,10 +93,11 @@ const PDFInput = () => {
         });
       }
 
-      if (data.pdfId) {
+      if (data.id) {
+        updatePdfDocsArray(data);
         router.refresh();
       }
-      // return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
+      // return router.push(`/doc/${data?.id}?continueBackdrop=false`);
     } catch (error: any) {
       console.log(error);
       toast({
@@ -134,7 +135,7 @@ const PDFInput = () => {
         });
       }
 
-      if (data.pdfId && !data.pdfExists) {
+      if (data.id && !data.pdfExists) {
         toast({
           title: "Success",
           description: "Resource successfully added!",
@@ -142,11 +143,11 @@ const PDFInput = () => {
         });
       }
 
-      if (data.pdfId) {
+      if (data.id) {
+        updatePdfDocsArray(data);
         router.refresh();
       }
-      // return router.push(`/doc/${data?.pdfId}?continueBackdrop=false`);
-      // router.refresh();
+      // return router.push(`/doc/${data?.id}?continueBackdrop=false`);
     } catch (error) {
       console.log("[COURSEID_ATT_ADD]", error);
       toast({

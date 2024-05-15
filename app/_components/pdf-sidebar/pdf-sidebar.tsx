@@ -11,6 +11,7 @@ import { usePdfStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
 import { PDFSidebarListItem } from "./pdf-sidebar-list-item";
 import { LoadingSidebar } from "./loading";
+import { PdfDocument } from "@prisma/client";
 
 const PDFSidebar = () => {
   const router = useRouter();
@@ -50,8 +51,8 @@ const PDFSidebar = () => {
       try {
         const { data } = await axios.get(`/api/doc/notes`);
         // setPdfList(data);
-        // console.log(data);
-        setPdfDocsArray(data as Paper[]);
+        console.log({ data });
+        setPdfDocsArray(data as Partial<PdfDocument>[]);
       } catch (error) {
         console.log(error);
       } finally {
@@ -75,14 +76,14 @@ const PDFSidebar = () => {
     router.push(`/doc/${pdfId}`);
   };
 
-  const pdfFilesList = pdfDocsArray.map((paper: Paper, i) => (
+  const pdfFilesList = pdfDocsArray.map((paper: Partial<PdfDocument>, i) => (
     <PDFSidebarListItem
       key={paper.id}
       isActiveItem={paper.id === activePdfId}
       isDarkTheme={resolvedTheme === "dark"}
-      pdfTitle={paper.pdf_title}
-      pdfUrl={paper.pdf_url}
-      onClick={() => handleListItemClick(paper.pdf_title, paper.id)}
+      pdfTitle={paper.pdf_title!}
+      pdfUrl={paper.pdf_url!}
+      onClick={() => handleListItemClick(paper.pdf_title!, paper.id!)}
     />
   ));
 
@@ -90,18 +91,20 @@ const PDFSidebar = () => {
     debounce((inputVal: string) => {
       if (inputVal !== "") {
         const filteredList = [...pdfDocsArray].filter((pdf) =>
-          pdf.pdf_title.toLowerCase().includes(inputVal.toLowerCase()),
+          pdf.pdf_title!.toLowerCase().includes(inputVal.toLowerCase()),
         );
-        const filteredListElems = filteredList.map((paper: Paper, i) => (
-          <PDFSidebarListItem
-            key={paper.id}
-            isActiveItem={paper.id === activePdfId}
-            isDarkTheme={resolvedTheme === "dark"}
-            pdfTitle={paper.pdf_title}
-            pdfUrl={paper.pdf_url}
-            onClick={() => handleListItemClick(paper.pdf_title, paper.id)}
-          />
-        ));
+        const filteredListElems = filteredList.map(
+          (paper: Partial<PdfDocument>, i) => (
+            <PDFSidebarListItem
+              key={paper.id}
+              isActiveItem={paper.id === activePdfId}
+              isDarkTheme={resolvedTheme === "dark"}
+              pdfTitle={paper.pdf_title!}
+              pdfUrl={paper.pdf_url!}
+              onClick={() => handleListItemClick(paper.pdf_title!, paper.id!)}
+            />
+          ),
+        );
         setFilteredPdfList(filteredListElems);
       } else {
         setFilteredPdfList(null);

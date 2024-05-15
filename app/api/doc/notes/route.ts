@@ -16,6 +16,7 @@ import * as pdfs from "@/lib/mock.json";
 import { loadPdfFromUrl, convertPdfToDocuments } from "@/lib/helpers";
 import { Paper } from "@/lib/types";
 import { db, prismaVectorStore } from "@/lib/database/db";
+import { PdfDocument } from "@prisma/client";
 
 /**
  * Sends a POST request to the OpenAI API to generate a summary of the PDF
@@ -51,7 +52,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       return NextResponse.json(
         {
           pdfExists: true,
-          pdfId: existingPdf.id,
+          id: existingPdf.id,
         },
         { status: 200 },
       );
@@ -70,7 +71,14 @@ export async function POST(req: Request): Promise<NextResponse> {
       },
     });
 
-    return NextResponse.json({ pdfId: pdfDocument.id }, { status: 200 });
+    return NextResponse.json(
+      {
+        id: pdfDocument.id,
+        pdf_title: pdfDocument.pdf_title,
+        pdf_url: pdfDocument.pdf_url,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     console.log("[NOTES_GENERATE]", error);
     return new NextResponse("Internal Error", { status: 500 });
@@ -88,7 +96,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     // const { userId } = auth();
     // if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
-    const pdfDocuments = await db.pdfDocument.findMany({
+    const pdfDocuments: Partial<PdfDocument>[] = await db.pdfDocument.findMany({
       select: {
         id: true,
         pdf_url: true,
