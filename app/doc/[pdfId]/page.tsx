@@ -1,5 +1,5 @@
 import React from "react";
-import { redirect, useSearchParams } from 'next/navigation'
+import { redirect, useSearchParams } from "next/navigation";
 import * as fs from "fs";
 import {
   ResizableHandle,
@@ -7,44 +7,49 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Paper } from "@/lib/types";
-import { loadPdfFromUrl } from "@/lib/helpers";
+import { loadPdfFromUrl, convertPdfToDocuments } from "@/lib/helpers";
 import PageLoadBackdrop from "@/components/page-load-backdrop";
-import {
-  PDFChat,
-  PDFNotes,
-  PDFViewer,
-} from "./_components";
+import { PDFChat, PDFNotes, PDFViewer } from "./_components";
+import { db } from "@/lib/database/db";
+import { PdfDocument } from "@prisma/client";
 
-
-export default async function DocPage({ params, searchParams }: { params: { pdfId: string }; searchParams: { [key: string]: string | string[] | undefined } }) {
+export default async function DocPage({
+  params,
+  searchParams,
+}: {
+  params: { pdfId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const { pdfId } = params;
-  
-  const { continueBackdrop } = searchParams.continueBackdrop === 'false' ? { continueBackdrop: false } : { continueBackdrop: undefined };
+  console.log({ pdfId });
 
-  console.log({continueBackdrop})
+  let { continueBackdrop } =
+    searchParams.continueBackdrop === "false"
+      ? { continueBackdrop: false }
+      : { continueBackdrop: undefined };
 
-  /**
-   * TODO: Read document data directly from database and storage 
-   * Pass data to components
-   */
+  console.log({ continueBackdrop });
 
-  const savedFiles = JSON.parse(fs.readFileSync("lib/mock.json", "utf-8"));
+  if (!pdfId) redirect("/");
 
-  const pdfData: Paper = savedFiles.find((pdf: Paper) => pdf.id === pdfId);
+  const pdfDocument: PdfDocument | null = await db.pdfDocument.findFirst({
+    where: { id: pdfId },
+  });
 
-  const pdfDoc = await loadPdfFromUrl({ url: pdfData?.pdf_url });
+  if (!pdfDocument) redirect("/");
 
-  if (!pdfData || !pdfId || !savedFiles.some((pdf: Paper) => pdf.id === pdfId)) redirect('/');
+  const pdfAsBuffer = await loadPdfFromUrl({ url: pdfDocument?.pdf_url });
+  continueBackdrop = true;
+  const docs = await convertPdfToDocuments(pdfAsBuffer, pdfDocument?.pdf_title);
+  console.log(docs);
+  continueBackdrop = false;
 
   return (
     <div className="h-full w-full">
       <PageLoadBackdrop pageLoad={continueBackdrop} />
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="w-full h-full"
-      >
+      <ResizablePanelGroup direction="horizontal" className="w-full h-full">
         <ResizablePanel defaultSize={45}>
-          <PDFViewer pdfDoc={pdfDoc.toString('base64')} />
+          <PDFViewer pdfDoc={pdfAsBuffer.toString("base64")} />
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel defaultSize={55}>
