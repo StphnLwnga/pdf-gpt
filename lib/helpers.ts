@@ -101,13 +101,12 @@ export async function convertPdfToDocuments(
   try {
     const docs = await loader.load();
     console.log("PDF converted successfully 🔀🔀");
+    // delete temporary PDF file
+    fs.unlinkSync(pdfPath);
     return docs;
   } catch (error) {
     console.log(error);
     throw new Error("PDF to Document conversion failed 🩻");
-  } finally {
-    // delete temporary PDF file
-    fs.unlinkSync(pdfPath);
   }
 }
 
