@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { PDFSidebarListItem } from "./pdf-sidebar-list-item";
 import { LoadingSidebar } from "./loading";
 import { PdfDocument } from "@prisma/client";
+import { Suspense } from "react";
 
 const PDFSidebar = () => {
   const router = useRouter();
@@ -37,7 +38,8 @@ const PDFSidebar = () => {
   const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (pathname === "/") setActivePdfId(null);
+    const page_id = pathname.split("/").filter((str: string) => str !== "")[1];
+    setActivePdfId(page_id ?? null);
   }, [pathname]);
 
   useEffect(() => {
@@ -130,15 +132,17 @@ const PDFSidebar = () => {
         )}
       >
         {!loading && fetchAttempted && pdfFilesList.length > 0 && (
-          <ul
-            role="list"
-            className={cn(
-              "divide-y divide-gray-100 w-full mr-0 pr-2 min-h-full",
-              resolvedTheme === "dark" && "divide-gray-650",
-            )}
-          >
-            {filteredPdfList ?? pdfFilesList}
-          </ul>
+          <Suspense fallback={<LoadingSidebar />}>
+            <ul
+              role="list"
+              className={cn(
+                "divide-y divide-gray-100 w-full mr-0 pr-2 min-h-full",
+                resolvedTheme === "dark" && "divide-gray-650",
+              )}
+            >
+              {filteredPdfList ?? pdfFilesList}
+            </ul>
+          </Suspense>
         )}
 
         {loading ||
