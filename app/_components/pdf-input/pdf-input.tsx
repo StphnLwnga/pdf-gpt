@@ -97,7 +97,8 @@ const PDFInput = () => {
         updatePdfDocsArray(data);
         router.refresh();
       }
-      // return router.push(`/doc/${data?.id}?continueBackdrop=false`);
+      // setLoadingDoc(false);
+      return router.push(`/doc/${data?.id}?continueBackdrop=false`);
     } catch (error: any) {
       console.log(error);
       toast({
@@ -110,8 +111,7 @@ const PDFInput = () => {
           </ToastAction>
         ),
       });
-    } finally {
-      setLoadingDoc(false);
+      router.refresh();
     }
   };
 
