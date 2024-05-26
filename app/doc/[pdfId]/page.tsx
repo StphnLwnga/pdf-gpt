@@ -1,6 +1,8 @@
-import React from "react";
+import React, { Suspense } from "react";
+import { createStreamableUI } from "ai/rsc";
 import { redirect, useSearchParams } from "next/navigation";
-import * as fs from "fs";
+import { formatDocumentsAsString } from "langchain/util/document";
+import { Document } from "langchain/document";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -12,6 +14,7 @@ import PageLoadBackdrop from "@/components/page-load-backdrop";
 import { PDFChat, PDFNotes, PDFViewer } from "./_components";
 import { db } from "@/lib/database/db";
 import { PdfDocument } from "@prisma/client";
+import Loading from "@/components/loading";
 
 export default async function DocPage({
   params,
@@ -20,15 +23,16 @@ export default async function DocPage({
   params: { pdfId: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  // const PdfDocUI = createStreamableUI();
+
+  // PdfDocUI.update(<PageLoadBackdrop />);
+
   const { pdfId } = params;
-  console.log({ pdfId });
 
   let { continueBackdrop } =
     searchParams.continueBackdrop === "false"
       ? { continueBackdrop: false }
       : { continueBackdrop: undefined };
-
-  console.log({ continueBackdrop });
 
   if (!pdfId) redirect("/");
 
@@ -38,29 +42,43 @@ export default async function DocPage({
 
   if (!pdfDocument) redirect("/");
 
-  const pdfAsBuffer = await loadPdfFromUrl({ url: pdfDocument?.pdf_url });
-  continueBackdrop = true;
-  const docs = await convertPdfToDocuments(pdfAsBuffer, pdfDocument?.pdf_title);
-  console.log(docs);
-  continueBackdrop = false;
+  const pdfAsBuffer = await loadPdfFromUrl({ url: pdfDocument?.pdf_url! });
+
+  let docs: Document[];
+  if (pdfDocument && !pdfDocument.pdf_text) {
+    docs = await convertPdfToDocuments(pdfAsBuffer, pdfDocument?.pdf_title);
+    const pdf_text = formatDocumentsAsString(docs);
+    const updatedPdfDocument = await db.pdfDocument.update({
+      where: {
+        id: pdfId,
+      },
+      data: { pdf_text },
+    });
+    console.log(updatedPdfDocument);
+  }
 
   return (
     <div className="h-full w-full">
-      <PageLoadBackdrop pageLoad={continueBackdrop} />
       <ResizablePanelGroup direction="horizontal" className="w-full h-full">
         <ResizablePanel defaultSize={45}>
-          <PDFViewer pdfDoc={pdfAsBuffer.toString("base64")} />
+          <Suspense fallback={<Loading />}>
+            <PDFViewer pdfDoc={pdfAsBuffer.toString("base64")} />
+          </Suspense>
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel defaultSize={55}>
           <ResizablePanelGroup direction="vertical">
             <ResizablePanel defaultSize={35}>
-              <PDFNotes />
-              <span className="text-2xl italic">{pdfId}</span>
+              <Suspense fallback={<Loading />}>
+                <PDFNotes />
+                <span className="text-2xl italic">{pdfId}</span>
+              </Suspense>
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel defaultSize={65}>
-              <PDFChat />
+              <Suspense fallback={<Loading />}>
+                <PDFChat />
+              </Suspense>
             </ResizablePanel>
           </ResizablePanelGroup>
         </ResizablePanel>
