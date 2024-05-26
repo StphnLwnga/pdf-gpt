@@ -15,6 +15,7 @@ import {
   NOTE_PROMPT,
   outputParser,
 } from "./prompts/note-prompt";
+import { db } from "./database/db";
 
 /**
  * Loads a PDF file from a given URL.
@@ -116,8 +117,9 @@ export async function convertPdfToDocuments(
  * @param {Array<Document>} documents - array of documents
  * @return {Promise<any>} the result of generating notes
  */
-async function generateNotes(
+export async function generateNotes(
   url: string,
+  id: string,
   documents: Array<Document>,
 ): Promise<Array<PdfNote>> {
   try {
@@ -130,9 +132,6 @@ async function generateNotes(
     const chain = NOTE_PROMPT.pipe(modelWithTool).pipe(outputParser);
 
     const notes = await chain.invoke({ paper: documentAsStr });
-
-    // Save notes locally
-    // saveNotesLocally(url, notes);
 
     return notes;
   } catch (error) {
