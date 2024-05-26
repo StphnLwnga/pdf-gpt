@@ -13,7 +13,7 @@ import { loadPdfFromUrl, convertPdfToDocuments } from "@/lib/helpers";
 import PageLoadBackdrop from "@/components/page-load-backdrop";
 import { PDFChat, PDFNotes, PDFViewer } from "./_components";
 import { db } from "@/lib/database/db";
-import { PdfDocument } from "@prisma/client";
+import { PdfDocument, PdfNote } from "@prisma/client";
 import Loading from "@/components/loading";
 
 export default async function DocPage({
@@ -29,32 +29,32 @@ export default async function DocPage({
 
   const { pdfId } = params;
 
-  let { continueBackdrop } =
-    searchParams.continueBackdrop === "false"
-      ? { continueBackdrop: false }
-      : { continueBackdrop: undefined };
-
   if (!pdfId) redirect("/");
 
-  const pdfDocument: PdfDocument | null = await db.pdfDocument.findFirst({
-    where: { id: pdfId },
-  });
+  const pdfDocument: (PdfDocument & { pdf_notes: PdfNote[] }) | null =
+    await db.pdfDocument.findFirst({
+      where: { id: pdfId },
+      include: {
+        pdf_notes: true,
+      },
+    });
 
   if (!pdfDocument) redirect("/");
 
   const pdfAsBuffer = await loadPdfFromUrl({ url: pdfDocument?.pdf_url! });
 
-  let docs: Document[];
   if (pdfDocument && !pdfDocument.pdf_text) {
-    docs = await convertPdfToDocuments(pdfAsBuffer, pdfDocument?.pdf_title);
+    const docs = await convertPdfToDocuments(
+      pdfAsBuffer,
+      pdfDocument?.pdf_title,
+    );
     const pdf_text = formatDocumentsAsString(docs);
-    const updatedPdfDocument = await db.pdfDocument.update({
+    await db.pdfDocument.update({
       where: {
         id: pdfId,
       },
       data: { pdf_text },
     });
-    console.log(updatedPdfDocument);
   }
 
   return (
@@ -68,14 +68,13 @@ export default async function DocPage({
         <ResizableHandle />
         <ResizablePanel defaultSize={55}>
           <ResizablePanelGroup direction="vertical">
-            <ResizablePanel defaultSize={35}>
+            <ResizablePanel defaultSize={45}>
               <Suspense fallback={<Loading />}>
-                <PDFNotes />
-                <span className="text-2xl italic">{pdfId}</span>
+                <PDFNotes id={pdfId} />
               </Suspense>
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel defaultSize={65}>
+            <ResizablePanel defaultSize={55}>
               <Suspense fallback={<Loading />}>
                 <PDFChat />
               </Suspense>
