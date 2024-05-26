@@ -32,7 +32,6 @@ model PdfDocument {
 model PdfNote {
   id          String @id @default(uuid())
   note        String
-  pageNumbers Int[]
 
   PdfDocument   PdfDocument? @relation(fields: [pdfDocumentId], references: [id])
   pdfDocumentId String?
