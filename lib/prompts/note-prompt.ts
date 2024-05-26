@@ -65,12 +65,12 @@ export const NOTE_PROMPT = ChatPromptTemplate.fromMessages([
     Rules:
     - Include specific quotes and details inside your notes.
     - Respond with as many notes as it might take to cover the entire text.
-    - Go into as much detail as you can, while keeping each note on a very specific part of the paper.
+    - Go into as much detail as you can, while keeping each note on a very specific part of the document.
     - DO NOT respond with notes like: "The text discusses XYZ", or "the text emphasizes XYZ", or "the text introduces XYZ",
      instead explain what XYZ is and how it works.
 
     Respond with a JSON array with two keys: "note" and "pageNumbers".
     "note" will be the specific note, and pageNumbers will be an array of numbers (if the note spans more than one page).`,
   ],
-  ["human", "Paper: {paper}"],
+  ["human", "Document: {document}"],
 ]);

@@ -118,12 +118,11 @@ export async function convertPdfToDocuments(
  * @return {Promise<any>} the result of generating notes
  */
 export async function generateNotes(
-  url: string,
-  id: string,
-  documents: Array<Document>,
+  // documents: Array<Document>,
+  documentAsStr: string,
 ): Promise<Array<PdfNote>> {
   try {
-    const documentAsStr = formatDocumentsAsString(documents);
+    // const documentAsStr = formatDocumentsAsString(documents);
 
     const modelWithTool = model.bind({
       tools: [NOTES_TOOL_SCHEMA],
@@ -131,7 +130,7 @@ export async function generateNotes(
 
     const chain = NOTE_PROMPT.pipe(modelWithTool).pipe(outputParser);
 
-    const notes = await chain.invoke({ paper: documentAsStr });
+    const notes = await chain.invoke({ document: documentAsStr });
 
     return notes;
   } catch (error) {
