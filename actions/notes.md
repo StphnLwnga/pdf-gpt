@@ -1,0 +1,3 @@
+- Action to retrieve single PDF file from DB on `/doc/:pdfId` page load.
+    - Will also fetch QA chat history
+- Action to retrieve QA chat history for a given PDF file

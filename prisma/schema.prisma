@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  directUrl    = env("DIRECT_URL")
+  relationMode = "prisma"
+  extensions   = [pgvector(map: "vector")] // Add the pgvector extension
+}
+
+model PdfDocument {
+  id        String               @id @default(uuid())
+  pdf_title String               @unique
+  pdf_text  String?
+  pdf_url   String               @unique
+  pdf_notes PdfNote[]
+  q_as      Question_Answering[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model PdfNote {
+  id          String @id @default(uuid())
+  note        String
+
+  PdfDocument   PdfDocument? @relation(fields: [pdfDocumentId], references: [id])
+  pdfDocumentId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([pdfDocumentId])
+}
+
+model Document_Embeddings {
+  id        String                 @id @default(uuid())
+  content   String
+  embedding Unsupported("vector")?
+  metadata  Unsupported("Jsonb")?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model Question_Answering {
+  id                String   @id @default(uuid())
+  question          String
+  answer            String
+  context           String
+  FollowupQuestions String[]
+
+  PdfDocument   PdfDocument? @relation(fields: [pdfDocumentId], references: [id])
+  pdfDocumentId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([pdfDocumentId])
+}
