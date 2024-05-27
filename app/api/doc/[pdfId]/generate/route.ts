@@ -1,7 +1,7 @@
 // import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 import { Document } from "langchain/document";
-import { PrismaClient } from "@prisma/client";
+import { PdfNote, PrismaClient } from "@prisma/client";
 import { db } from "@/lib/database/db";
 import { generateNotes } from "@/lib/helpers";
 
@@ -16,23 +16,27 @@ export async function POST(req: Request): Promise<NextResponse> {
 
     const pdfDoc = await db.pdfDocument.findFirst({
       where: { id },
-      select: { pdf_text: true },
+      include: { pdf_notes: true },
     });
 
     if (!pdfDoc) return new NextResponse("File not found", { status: 500 });
 
-    const { pdf_text } = pdfDoc;
+    const { pdf_text, pdf_notes } = pdfDoc;
+
+    if (pdf_notes.length > 0) {
+      return NextResponse.json({ notes: pdf_notes }, { status: 200 });
+    }
 
     const notes = await generateNotes(pdf_text);
 
-    // console.log({ notes });
+    const savedNotes = await db.pdfNote.createManyAndReturn({
+      data: notes.map((note: PdfNote) => ({
+        note: note.note,
+        pdfDocumentId: id,
+      })),
+    });
 
-    // await db.PdfNote.create({
-    //   data: {
-    //     note: notes,
-    //     pdfDocumentId: id,
-    //   },
-    // });
+    console.log(savedNotes);
 
     return NextResponse.json({ notes }, { status: 200 });
   } catch (error) {
